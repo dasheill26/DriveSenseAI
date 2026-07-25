@@ -77,7 +77,21 @@ Project Outcome
 DriveSense AI successfully demonstrates how software engineering and artificial intelligence can be combined to improve vehicle diagnostics, enhance driver understanding, and support predictive maintenance decisions.
 
 ⸻
+Project Documentation
 
+The full final-year project dissertation can be found here:
+
+DriveSenseAI_Dissertation.pdf
+
+The report includes:
+- Requirements analysis
+- System architecture
+- Rule-based AI design
+- Machine learning implementation
+- Database design
+- Testing and evaluation
+- Future enhancements
+- 
 Author
 
 Dasheill Vas
