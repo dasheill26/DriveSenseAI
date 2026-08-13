@@ -1,0 +1,894 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="reportPage">
+
+    <section class="reportHero">
+
+        <div class="reportHeroLeft">
+
+            <div class="reportBadge">
+                DRIVE HISTORY & VEHICLE INTELLIGENCE
+            </div>
+
+            <h1>{{ vehicle_name }}</h1>
+
+            <p>
+                AI-powered vehicle profile with MOT-style history,
+                ownership insights, mileage tracking, maintenance risk
+                and vehicle intelligence reporting.
+            </p>
+
+            <div class="heroMeta">
+
+                <div>
+                    <span>Registration</span>
+                    <strong>
+                        {{ registration_plate if registration_plate else "DS-AI-001" }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>VIN</span>
+                    <strong>
+                        {{ vin_number if vin_number else "VIN Not Added" }}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Mileage</span>
+                    <strong>
+                        {{ vehicle_mileage }} mi
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="reportHeroRight">
+
+            <div class="heroCarCard">
+                <img
+                    src="{{ url_for('static', filename='img/my_car.png') }}"
+                    alt="Vehicle"
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="scoreGrid">
+
+        <div class="scoreCard">
+            <span>Vehicle Health</span>
+            <strong>{{ health_score }}%</strong>
+            <small>DriveSense Rule Engine</small>
+        </div>
+
+        <div class="scoreCard">
+            <span>ML Prediction</span>
+            <strong>{{ ml_health_score }}%</strong>
+            <small>Machine Learning</small>
+        </div>
+
+        <div class="scoreCard">
+            <span>Repair Urgency</span>
+
+            {% if repair_urgency == "Critical" %}
+                <strong class="redText">{{ repair_urgency }}</strong>
+            {% elif repair_urgency == "High" %}
+                <strong class="orangeText">{{ repair_urgency }}</strong>
+            {% elif repair_urgency == "Medium" %}
+                <strong class="amberText">{{ repair_urgency }}</strong>
+            {% else %}
+                <strong class="greenText">{{ repair_urgency }}</strong>
+            {% endif %}
+
+            <small>AI Risk Engine</small>
+        </div>
+
+        <div class="scoreCard">
+            <span>Safe To Drive</span>
+
+            {% if safe_to_drive %}
+                <strong class="greenText">YES</strong>
+            {% else %}
+                <strong class="redText">NO</strong>
+            {% endif %}
+
+            <small>Vehicle Safety State</small>
+        </div>
+
+    </section>
+
+    <section class="panel actionPanel">
+
+        <div class="panelHeader">
+            <h2>⚡ Quick Actions</h2>
+            <span>DriveSense tools</span>
+        </div>
+
+        <div class="quickGrid">
+            <a href="/report/pdf" target="_blank">📄 Export PDF</a>
+            <a href="/scan">🔍 Run Scan</a>
+            <a href="/live">📡 Open Live Data</a>
+            <a href="/diagnostics">🧰 Diagnostics</a>
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <div class="panelHeader">
+            <h2>📅 Vehicle Timeline</h2>
+            <span>Historical records & events</span>
+        </div>
+
+        <div class="timeline">
+
+            <div class="timelineItem">
+                <div class="timelineDot"></div>
+
+                <div class="timelineCard">
+                    <strong>Vehicle Registered</strong>
+                    <span>{{ vehicle_year }}</span>
+
+                    <p>
+                        Vehicle entered registration system and became active.
+                    </p>
+                </div>
+            </div>
+
+            {% if recent_scans %}
+
+                {% for scan in recent_scans %}
+
+                    <div class="timelineItem">
+                        <div class="timelineDot blue"></div>
+
+                        <div class="timelineCard">
+
+                            <strong>DriveSense Scan</strong>
+
+                            <span>{{ scan.time }}</span>
+
+                            <p>
+                                {{ scan.fault_count }} faults detected •
+                                ML score {{ scan.ml_health_score }}%
+                            </p>
+
+                        </div>
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+    <div class="reportGrid">
+
+        <div class="leftColumn">
+
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>🚘 Vehicle Information</h2>
+                    <span>DriveSense Profile</span>
+                </div>
+
+                <div class="infoGrid">
+
+                    <div class="infoBox">
+                        <span>Vehicle</span>
+                        <strong>{{ vehicle_name }}</strong>
+                    </div>
+
+                    <div class="infoBox">
+                        <span>Model</span>
+                        <strong>{{ vehicle_model }}</strong>
+                    </div>
+
+                    <div class="infoBox">
+                        <span>Engine</span>
+                        <strong>{{ vehicle_engine }}</strong>
+                    </div>
+
+                    <div class="infoBox">
+                        <span>Fuel Type</span>
+                        <strong>{{ fuel_type }}</strong>
+                    </div>
+
+                    <div class="infoBox">
+                        <span>Registration</span>
+                        <strong>
+                            {{ registration_plate if registration_plate else "Not Added" }}
+                        </strong>
+                    </div>
+
+                    <div class="infoBox">
+                        <span>VIN</span>
+                        <strong>
+                            {{ vin_number if vin_number else "Not Added" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>⚠ Active Diagnostic Faults</h2>
+                    <span>{{ faults|length }} detected</span>
+                </div>
+
+                {% if faults and faults|length > 0 %}
+
+                    <div class="faultList">
+
+                        {% for fault in faults %}
+
+                            <div class="faultCard">
+
+                                <div class="faultTop">
+
+                                    <div>
+                                        <strong>{{ fault.code }}</strong>
+                                        <span>{{ fault.title }}</span>
+                                    </div>
+
+                                    <div class="faultSeverity {{ fault.sev_class }}">
+                                        {{ fault.severity_label }}
+                                    </div>
+
+                                </div>
+
+                                <p>
+                                    {{ fault.definition }}
+                                </p>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="emptyBox">
+                        No active faults detected.
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+            {% if mot_history %}
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>🧾 MOT History</h2>
+                    <span>Inspection records</span>
+                </div>
+
+                <div class="motList">
+
+                    {% for mot in mot_history %}
+
+                        <div class="motCard">
+
+                            <div>
+                                <strong>{{ mot.label }}</strong>
+                                <span>{{ mot.date }}</span>
+
+                                {% if mot.next_expiry %}
+                                    <small>Next expiry: {{ mot.next_expiry }}</small>
+                                {% endif %}
+                            </div>
+
+                            <div class="motRight">
+                                <b>{{ mot.result }}</b>
+                                <small>Test #{{ mot.test_number }}</small>
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+            {% endif %}
+
+        </div>
+
+        <div class="rightColumn">
+
+            <section class="panel aiPanel">
+
+                <h2>🧠 AI Vehicle Intelligence</h2>
+
+                <p class="aiText">
+                    {{ ml_message }}
+                </p>
+
+                <div class="aiStats">
+
+                    <div>
+                        <span>Confidence</span>
+                        <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+                    </div>
+
+                    <div>
+                        <span>Model</span>
+                        <strong>{{ ml_model_used }}</strong>
+                    </div>
+
+                </div>
+
+                <div class="confidenceBar">
+                    <div style="width: {{ (ml_confidence * 100)|round(0) }}%"></div>
+                </div>
+
+            </section>
+
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>🛠 Maintenance Overview</h2>
+                    <span>Service intelligence</span>
+                </div>
+
+                {% if service_schedule %}
+
+                    <div class="serviceList">
+
+                        {% for item in service_schedule[:5] %}
+
+                            <div class="serviceItem {{ item.css_class }}">
+
+                                <div>
+                                    <strong>{{ item.service_type }}</strong>
+
+                                    <span>
+                                        {{ item.next_due_date }}
+                                    </span>
+                                </div>
+
+                                <div class="serviceRight">
+                                    {{ item.status }}
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="emptyBox">
+                        No service schedule available.
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>📄 Report Export</h2>
+                    <span>PDF download</span>
+                </div>
+
+                <p class="exportText">
+                    Download a professional DriveSense diagnostic PDF including vehicle details,
+                    live data, active faults, AI risk prediction and service records.
+                </p>
+
+                <a href="/report/pdf" target="_blank" class="exportBtn">
+                    Export Full PDF Report
+                </a>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.reportPage{
+    max-width:1600px;
+    margin:auto;
+    padding:28px;
+    color:white;
+}
+
+.reportHero,
+.panel{
+    background:
+    linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:30px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.reportHero{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:30px;
+    align-items:center;
+    padding:34px;
+    position:relative;
+    overflow:hidden;
+}
+
+.reportHero::before{
+    content:"";
+    position:absolute;
+    width:420px;
+    height:420px;
+    right:-120px;
+    top:-120px;
+    background:radial-gradient(circle,rgba(0,200,255,.16),transparent 70%);
+}
+
+.reportHeroLeft,
+.reportHeroRight{
+    position:relative;
+    z-index:2;
+}
+
+.reportBadge{
+    display:inline-block;
+    background:rgba(0,200,255,.1);
+    border:1px solid rgba(0,200,255,.22);
+    color:#00c8ff;
+    padding:9px 15px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+}
+
+.reportHero h1{
+    margin:16px 0 10px;
+    font-size:52px;
+}
+
+.reportHero p{
+    opacity:.75;
+    line-height:1.7;
+    max-width:760px;
+}
+
+.heroMeta{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:24px;
+}
+
+.heroMeta div{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:16px;
+}
+
+.heroMeta span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.heroMeta strong{
+    font-size:17px;
+    word-break:break-word;
+}
+
+.heroCarCard{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:310px;
+    background:radial-gradient(circle,rgba(0,255,157,.14),transparent 65%);
+}
+
+.heroCarCard img{
+    max-width:100%;
+    max-height:320px;
+    object-fit:contain;
+    filter:drop-shadow(0 28px 35px rgba(0,0,0,.55));
+}
+
+.scoreGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-top:24px;
+}
+
+.scoreCard{
+    background:#0b1418;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    padding:24px;
+    transition:.25s;
+}
+
+.scoreCard:hover{
+    transform:translateY(-4px);
+    border-color:rgba(0,200,255,.5);
+}
+
+.scoreCard span{
+    display:block;
+    opacity:.65;
+}
+
+.scoreCard strong{
+    display:block;
+    font-size:36px;
+    margin-top:10px;
+}
+
+.scoreCard small{
+    display:block;
+    opacity:.6;
+    margin-top:8px;
+}
+
+.panel{
+    padding:24px;
+    margin-top:24px;
+}
+
+.panelHeader{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:20px;
+    align-items:center;
+}
+
+.panelHeader h2{
+    margin:0;
+}
+
+.panelHeader span{
+    color:#00c8ff;
+    font-weight:900;
+}
+
+.quickGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+}
+
+.quickGrid a,
+.exportBtn{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    color:white;
+    text-decoration:none;
+    border-radius:16px;
+    padding:18px;
+    text-align:center;
+    font-weight:900;
+    transition:.25s;
+}
+
+.quickGrid a:hover,
+.exportBtn:hover{
+    transform:translateY(-4px);
+    border-color:#00c8ff;
+}
+
+.exportBtn{
+    display:block;
+    margin-top:18px;
+    background:linear-gradient(135deg,#00c8ff,#00ff9d);
+    color:#001014;
+    border:none;
+}
+
+.exportText{
+    opacity:.75;
+    line-height:1.7;
+    margin:0;
+}
+
+.timeline{
+    border-left:2px solid rgba(255,255,255,.08);
+    padding-left:24px;
+}
+
+.timelineItem{
+    margin-bottom:24px;
+    position:relative;
+}
+
+.timelineDot{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#00ff9d;
+    position:absolute;
+    left:-33px;
+    top:8px;
+    box-shadow:0 0 18px rgba(0,255,157,.55);
+}
+
+.timelineDot.blue{
+    background:#00c8ff;
+    box-shadow:0 0 18px rgba(0,200,255,.55);
+}
+
+.timelineCard{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+}
+
+.timelineCard strong{
+    display:block;
+    font-size:18px;
+}
+
+.timelineCard span{
+    display:block;
+    color:#00c8ff;
+    margin-top:6px;
+}
+
+.timelineCard p{
+    opacity:.7;
+    line-height:1.6;
+    margin-bottom:0;
+}
+
+.reportGrid{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:24px;
+}
+
+.infoGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.infoBox,
+.faultCard,
+.serviceItem,
+.aiStats div,
+.motCard{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:18px;
+}
+
+.infoBox span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.infoBox strong{
+    word-break:break-word;
+}
+
+.faultList,
+.serviceList,
+.motList{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.faultTop,
+.serviceItem,
+.motCard{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    align-items:center;
+}
+
+.faultTop strong{
+    display:block;
+    color:#ff4d4d;
+    font-size:18px;
+}
+
+.faultTop span{
+    opacity:.75;
+}
+
+.faultCard p{
+    opacity:.7;
+    line-height:1.6;
+    margin-bottom:0;
+}
+
+.faultSeverity{
+    padding:9px 12px;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.sev-high{
+    background:rgba(255,77,77,.16);
+    color:#ff4d4d;
+}
+
+.sev-med{
+    background:rgba(255,177,66,.16);
+    color:#ffb142;
+}
+
+.sev-low{
+    background:rgba(0,255,157,.16);
+    color:#00ff9d;
+}
+
+.aiPanel{
+    background:
+    radial-gradient(circle at top right,rgba(0,200,255,.16),transparent 42%),
+    linear-gradient(145deg,#0b1418,#071014);
+}
+
+.aiText{
+    opacity:.8;
+    line-height:1.8;
+}
+
+.aiStats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.aiStats span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.aiStats strong{
+    font-size:22px;
+}
+
+.confidenceBar{
+    height:10px;
+    background:#111827;
+    border-radius:999px;
+    overflow:hidden;
+    margin-top:18px;
+}
+
+.confidenceBar div{
+    height:100%;
+    background:linear-gradient(90deg,#00c8ff,#00ff9d);
+}
+
+.serviceItem.good{
+    border-left:4px solid #00ff9d;
+}
+
+.serviceItem.warning{
+    border-left:4px solid #ffb142;
+}
+
+.serviceItem.danger{
+    border-left:4px solid #ff4d4d;
+}
+
+.serviceItem strong,
+.motCard strong{
+    display:block;
+}
+
+.serviceItem span,
+.motCard span,
+.motCard small{
+    display:block;
+    opacity:.65;
+    margin-top:5px;
+}
+
+.serviceRight{
+    font-weight:900;
+}
+
+.motRight{
+    text-align:right;
+}
+
+.motRight b{
+    color:#00ff9d;
+}
+
+.emptyBox{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:20px;
+    opacity:.7;
+}
+
+.greenText{
+    color:#00ff9d;
+}
+
+.amberText{
+    color:#ffb142;
+}
+
+.orangeText{
+    color:#ff8c42;
+}
+
+.redText{
+    color:#ff4d4d;
+}
+
+@media(max-width:1200px){
+
+    .reportHero,
+    .reportGrid{
+        grid-template-columns:1fr;
+    }
+
+    .scoreGrid,
+    .quickGrid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:700px){
+
+    .heroMeta,
+    .scoreGrid,
+    .infoGrid,
+    .aiStats,
+    .quickGrid{
+        grid-template-columns:1fr;
+    }
+
+    .reportHero h1{
+        font-size:38px;
+    }
+
+    .faultTop,
+    .serviceItem,
+    .motCard,
+    .panelHeader{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .motRight{
+        text-align:left;
+    }
+}
+
+</style>
+
+{% endblock %}

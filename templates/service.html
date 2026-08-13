@@ -1,0 +1,973 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="servicePage">
+
+    <!-- HERO -->
+    <section class="serviceHero">
+
+        <div>
+            <div class="heroBadge">BMW SERVICE HISTORY</div>
+
+            <h1>Service Records</h1>
+
+            <p>
+                Track maintenance history, service intervals, next due dates and mileage-based part replacement.
+            </p>
+
+            <div class="heroMeta">
+                <span>{{ vehicle_name }}</span>
+                <span>{{ vehicle_year }}</span>
+                <span>{{ current_mileage }} mi</span>
+
+                {% if due_items and due_items|length > 0 %}
+                    <span class="warningMeta">
+                        {{ due_items|length }} items need attention
+                    </span>
+                {% else %}
+                    <span class="goodMeta">
+                        All services healthy
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="heroStatus">
+            <div class="statusDot"></div>
+
+            <div>
+                <strong>Maintenance Tracker Active</strong>
+                <span>SQLite service database connected</span>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- MAIN GRID -->
+    <div class="serviceGrid">
+
+        <!-- LEFT -->
+        <div class="leftCol">
+
+            <!-- NEXT SERVICE -->
+            {% if next_service_item %}
+            <section class="panel nextServicePanel">
+
+                <div class="panelHeader">
+                    <h2>🔧 Next Recommended Service</h2>
+                </div>
+
+                <div class="nextServiceCard {{ next_service_item.css_class }}">
+
+                    <div class="nextTop">
+
+                        <div>
+                            <div class="nextType">
+                                {{ next_service_item.service_type }}
+                            </div>
+
+                            <div class="nextStatus">
+                                {{ next_service_item.status }}
+                            </div>
+                        </div>
+
+                        <div class="nextMileage">
+                            {{ next_service_item.next_due_mileage }} mi
+                        </div>
+
+                    </div>
+
+                    <div class="nextInfoGrid">
+
+                        <div>
+                            <small>Last Done</small>
+                            <strong>{{ next_service_item.last_done }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Next Due Date</small>
+                            <strong>{{ next_service_item.next_due_date }}</strong>
+                        </div>
+
+                        <div>
+                            <small>Miles Remaining</small>
+                            <strong>{{ next_service_item.miles_left }}</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="nextMessage">
+
+                        {% if next_service_item.status == "Overdue" %}
+                            This item is overdue and should be serviced immediately.
+                        {% elif next_service_item.status == "Due Soon" %}
+                            This item is approaching its recommended interval.
+                        {% else %}
+                            This item is currently within healthy service limits.
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </section>
+            {% endif %}
+
+            <!-- ADD RECORD -->
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>➕ Add Service Record</h2>
+                </div>
+
+                <form class="serviceForm"
+                      method="POST"
+                      action="/api/add_service_record">
+
+                    <div class="formGrid">
+
+                        <div>
+                            <label>Service Type</label>
+
+                            <select name="service_type">
+
+                                <option>Full Service</option>
+                                <option>Oil Change</option>
+                                <option>Oil Filter</option>
+                                <option>Air Filter</option>
+                                <option>Cabin Filter</option>
+                                <option>Spark Plugs</option>
+                                <option>Brake Pads</option>
+                                <option>Brake Fluid</option>
+                                <option>Coolant</option>
+                                <option>Tyres</option>
+                                <option>MOT</option>
+
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Service Date</label>
+
+                            <input
+                                type="date"
+                                name="service_date"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label>Mileage</label>
+
+                            <input
+                                type="number"
+                                name="mileage"
+                                placeholder="65081"
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label>Cost (£)</label>
+
+                            <input
+                                type="number"
+                                name="cost"
+                                placeholder="0"
+                            >
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <label>Notes / Garage</label>
+
+                        <textarea
+                            name="notes"
+                            placeholder="Example: Oil and filter changed at BMW specialist."
+                        ></textarea>
+                    </div>
+
+                    <button class="primaryBtn" type="submit">
+                        Save Service Record
+                    </button>
+
+                </form>
+
+            </section>
+
+            <!-- SERVICE HISTORY -->
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>📘 Real Service Timeline</h2>
+                    <span>{{ service_records|length }} records</span>
+                </div>
+
+                {% if service_records and service_records|length > 0 %}
+
+                    <div class="timeline">
+
+                        {% for record in service_records %}
+
+                            <div class="timelineItem">
+
+                                <div class="timelineDot"></div>
+
+                                <div class="timelineCard">
+
+                                    <div class="timelineTop">
+
+                                        <div>
+
+                                            <div class="recordType">
+                                                {{ record.service_type }}
+                                            </div>
+
+                                            <div class="recordDate">
+                                                {{ record.service_date }}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="mileageBadge">
+                                            {{ record.mileage }} mi
+                                        </div>
+
+                                    </div>
+
+                                    <p>
+                                        {{ record.notes if record.notes else "Service record logged in DriveSense." }}
+                                    </p>
+
+                                    <div class="recordBottom">
+
+                                        <span>
+                                            Next due:
+                                            {{ record.next_due_date }}
+                                        </span>
+
+                                        <span>
+                                            {{ record.next_due_mileage }} mi
+                                        </span>
+
+                                        <a href="/api/delete_service_record/{{ record.id }}">
+                                            Delete
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="emptyBox">
+                        No service records yet.
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="rightCol">
+
+            <!-- SERVICE STATUS -->
+            <section class="panel statusPanel">
+
+                <h2>🧠 Maintenance Intelligence</h2>
+
+                <div class="bigMileage">
+                    {{ current_mileage }}
+                    <span>mi</span>
+                </div>
+
+                <p>
+                    DriveSense calculates future service requirements based on your real BMW service history,
+                    mileage and time intervals.
+                </p>
+
+            </section>
+
+            <!-- DUE COUNTER -->
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>⚠ Service Alerts</h2>
+                </div>
+
+                <div class="alertGrid">
+
+                    <div class="alertCard redAlert">
+                        <strong>
+                            {{
+                                due_items
+                                | selectattr("status", "equalto", "Overdue")
+                                | list
+                                | length
+                            }}
+                        </strong>
+
+                        <span>Overdue</span>
+                    </div>
+
+                    <div class="alertCard amberAlert">
+                        <strong>
+                            {{
+                                due_items
+                                | selectattr("status", "equalto", "Due Soon")
+                                | list
+                                | length
+                            }}
+                        </strong>
+
+                        <span>Due Soon</span>
+                    </div>
+
+                    <div class="alertCard greenAlert">
+                        <strong>
+                            {{
+                                service_schedule
+                                | selectattr("status", "equalto", "OK")
+                                | list
+                                | length
+                            }}
+                        </strong>
+
+                        <span>Healthy</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- DUE SCHEDULE -->
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>⏱ Parts Due Timeline</h2>
+                </div>
+
+                <div class="scheduleList">
+
+                    {% for item in service_schedule %}
+
+                        <div class="scheduleItem {{ item.css_class }}">
+
+                            <div class="scheduleTop">
+
+                                <strong>
+                                    {{ item.service_type }}
+                                </strong>
+
+                                <span>
+                                    {{ item.status }}
+                                </span>
+
+                            </div>
+
+                            <div class="scheduleInfo">
+
+                                <div>
+                                    <small>Last Done</small>
+                                    <b>{{ item.last_done }}</b>
+                                </div>
+
+                                <div>
+                                    <small>Next Date</small>
+                                    <b>{{ item.next_due_date }}</b>
+                                </div>
+
+                                <div>
+                                    <small>Next Mileage</small>
+                                    <b>{{ item.next_due_mileage }} mi</b>
+                                </div>
+
+                            </div>
+
+                            <div class="dueLine">
+
+                                {% if item.status == "Overdue" %}
+
+                                    Overdue by
+                                    {{ item.days_left|abs }}
+                                    days or mileage exceeded.
+
+                                {% elif item.status == "Due Soon" %}
+
+                                    Due soon.
+                                    {{ item.days_left }}
+                                    days /
+                                    {{ item.miles_left }}
+                                    miles remaining.
+
+                                {% else %}
+
+                                    Healthy.
+                                    {{ item.days_left }}
+                                    days /
+                                    {{ item.miles_left }}
+                                    miles remaining.
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.servicePage{
+    max-width:1600px;
+    margin:auto;
+    padding:28px;
+    color:white;
+}
+
+.serviceHero,
+.panel{
+    background:linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.serviceHero{
+    padding:32px;
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:center;
+    margin-bottom:24px;
+}
+
+.heroBadge{
+    display:inline-block;
+    color:#00c8ff;
+    background:rgba(0,200,255,.1);
+    border:1px solid rgba(0,200,255,.25);
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:14px;
+}
+
+.serviceHero h1{
+    margin:0;
+    font-size:48px;
+}
+
+.serviceHero p{
+    opacity:.75;
+    line-height:1.7;
+    max-width:720px;
+}
+
+.heroMeta{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:18px;
+}
+
+.heroMeta span{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    padding:11px 15px;
+    border-radius:14px;
+    font-weight:800;
+}
+
+.warningMeta{
+    color:#ffb142;
+}
+
+.goodMeta{
+    color:#00ff9d;
+}
+
+.heroStatus{
+    min-width:310px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    padding:20px;
+    border-radius:20px;
+}
+
+.heroStatus span{
+    display:block;
+    opacity:.65;
+    margin-top:4px;
+}
+
+.statusDot{
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    background:#00ff9d;
+    box-shadow:0 0 18px #00ff9d;
+}
+
+.serviceGrid{
+    display:grid;
+    grid-template-columns:1.35fr .85fr;
+    gap:24px;
+}
+
+.leftCol,
+.rightCol{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.panel{
+    padding:24px;
+}
+
+.panelHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.panel h2,
+.panelHeader h2{
+    margin:0;
+    font-size:24px;
+}
+
+.panelHeader span{
+    color:#00c8ff;
+    font-weight:900;
+}
+
+/* NEXT SERVICE */
+
+.nextServiceCard{
+    border-radius:24px;
+    padding:24px;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.nextServiceCard.good{
+    background:rgba(0,255,157,.05);
+    border-color:rgba(0,255,157,.18);
+}
+
+.nextServiceCard.warning{
+    background:rgba(255,177,66,.06);
+    border-color:rgba(255,177,66,.25);
+}
+
+.nextServiceCard.danger{
+    background:rgba(255,77,77,.06);
+    border-color:rgba(255,77,77,.25);
+}
+
+.nextTop{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    align-items:flex-start;
+}
+
+.nextType{
+    font-size:28px;
+    font-weight:900;
+}
+
+.nextStatus{
+    margin-top:6px;
+    opacity:.75;
+}
+
+.nextMileage{
+    background:black;
+    padding:12px 16px;
+    border-radius:14px;
+    font-weight:900;
+}
+
+.nextInfoGrid{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.nextInfoGrid div{
+    background:rgba(0,0,0,.22);
+    border-radius:16px;
+    padding:16px;
+}
+
+.nextInfoGrid small{
+    display:block;
+    opacity:.6;
+    margin-bottom:8px;
+}
+
+.nextMessage{
+    margin-top:20px;
+    line-height:1.7;
+    opacity:.78;
+}
+
+/* FORM */
+
+.serviceForm{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.formGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    opacity:.7;
+    font-size:13px;
+    font-weight:800;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    background:#111827;
+    border:1px solid #1f2937;
+    color:white;
+    padding:14px;
+    border-radius:14px;
+    font-size:15px;
+}
+
+textarea{
+    min-height:95px;
+    resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:#00c8ff;
+}
+
+.primaryBtn{
+    width:max-content;
+    background:#00c8ff;
+    color:black;
+    border:none;
+    border-radius:16px;
+    padding:15px 22px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+/* TIMELINE */
+
+.timeline{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.timelineItem{
+    display:grid;
+    grid-template-columns:30px 1fr;
+    gap:14px;
+}
+
+.timelineDot{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#00c8ff;
+    box-shadow:0 0 16px #00c8ff;
+    margin-top:18px;
+}
+
+.timelineCard{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:20px;
+    padding:18px;
+}
+
+.timelineTop{
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    align-items:flex-start;
+}
+
+.recordType{
+    font-size:22px;
+    font-weight:900;
+}
+
+.recordDate{
+    color:#00c8ff;
+    margin-top:5px;
+    font-weight:800;
+}
+
+.mileageBadge{
+    background:rgba(0,255,157,.12);
+    border:1px solid rgba(0,255,157,.25);
+    color:#00ff9d;
+    padding:10px 14px;
+    border-radius:12px;
+    font-weight:900;
+}
+
+.timelineCard p{
+    line-height:1.65;
+    opacity:.74;
+}
+
+.recordBottom{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    border-top:1px solid rgba(255,255,255,.08);
+    padding-top:14px;
+    margin-top:14px;
+}
+
+.recordBottom span{
+    opacity:.75;
+}
+
+.recordBottom a{
+    color:#ff4d4d;
+    text-decoration:none;
+    font-weight:900;
+}
+
+/* RIGHT */
+
+.statusPanel{
+    background:
+    radial-gradient(circle at top right,rgba(0,200,255,.12),transparent 40%),
+    linear-gradient(145deg,#0b1418,#071014);
+}
+
+.bigMileage{
+    font-size:54px;
+    font-weight:900;
+    margin-top:20px;
+}
+
+.bigMileage span{
+    font-size:22px;
+    opacity:.65;
+}
+
+.statusPanel p{
+    opacity:.75;
+    line-height:1.7;
+}
+
+/* ALERTS */
+
+.alertGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.alertCard{
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+}
+
+.alertCard strong{
+    display:block;
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.redAlert{
+    background:rgba(255,77,77,.12);
+    border:1px solid rgba(255,77,77,.25);
+}
+
+.amberAlert{
+    background:rgba(255,177,66,.12);
+    border:1px solid rgba(255,177,66,.25);
+}
+
+.greenAlert{
+    background:rgba(0,255,157,.12);
+    border:1px solid rgba(0,255,157,.25);
+}
+
+/* SCHEDULE */
+
+.scheduleList{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.scheduleItem{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+}
+
+.scheduleItem.good{
+    border-color:rgba(0,255,157,.22);
+}
+
+.scheduleItem.warning{
+    border-color:rgba(255,177,66,.35);
+}
+
+.scheduleItem.danger{
+    border-color:rgba(255,77,77,.4);
+}
+
+.scheduleTop{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.scheduleTop strong{
+    font-size:20px;
+}
+
+.scheduleTop span{
+    padding:8px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+}
+
+.scheduleItem.good .scheduleTop span{
+    background:rgba(0,255,157,.13);
+    color:#00ff9d;
+}
+
+.scheduleItem.warning .scheduleTop span{
+    background:rgba(255,177,66,.16);
+    color:#ffb142;
+}
+
+.scheduleItem.danger .scheduleTop span{
+    background:rgba(255,77,77,.16);
+    color:#ff4d4d;
+}
+
+.scheduleInfo{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.scheduleInfo div{
+    background:rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:13px;
+    padding:12px;
+}
+
+.scheduleInfo small{
+    display:block;
+    opacity:.55;
+    margin-bottom:6px;
+}
+
+.scheduleInfo b{
+    font-size:14px;
+}
+
+.dueLine{
+    margin-top:14px;
+    opacity:.72;
+    line-height:1.5;
+}
+
+@media(max-width:1200px){
+
+    .serviceGrid{
+        grid-template-columns:1fr;
+    }
+
+    .formGrid,
+    .scheduleInfo,
+    .nextInfoGrid,
+    .alertGrid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .serviceHero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:700px){
+
+    .formGrid,
+    .scheduleInfo,
+    .nextInfoGrid,
+    .alertGrid{
+        grid-template-columns:1fr;
+    }
+
+    .timelineTop,
+    .recordBottom,
+    .scheduleTop,
+    .nextTop{
+        flex-direction:column;
+    }
+
+    .serviceHero h1{
+        font-size:36px;
+    }
+}
+
+</style>
+
+{% endblock %}

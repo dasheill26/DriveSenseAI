@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="predictivePage">
+
+    <section class="predictiveHero">
+        <div>
+            <div class="heroBadge">PREDICTIVE MAINTENANCE AI</div>
+
+            <h1>Predictive Vehicle Health</h1>
+
+            <p>
+                DriveSense AI predicts upcoming component wear using mileage,
+                service history, live telemetry, active faults and interpretable
+                machine learning analysis.
+            </p>
+
+            <div class="heroMeta">
+                <span>{{ vehicle_name }}</span>
+                <span>{{ vehicle_year }}</span>
+                <span>{{ current_mileage }} mi</span>
+            </div>
+        </div>
+
+        <div class="aiStatusCard">
+            <div class="aiPulse"></div>
+
+            <div>
+                <strong>AI Model Active</strong>
+                <span>{{ ml_model_used }}</span>
+            </div>
+        </div>
+    </section>
+
+    {% set highest = predictive_items|sort(attribute='risk', reverse=true)|first %}
+
+    <section class="summaryGrid">
+
+        <div class="summaryCard">
+            <span>Highest Risk</span>
+            <strong>{{ highest.component }}</strong>
+            <small>{{ highest.risk }}% predicted risk</small>
+        </div>
+
+        <div class="summaryCard">
+            <span>Current Mileage</span>
+            <strong>{{ current_mileage }}</strong>
+            <small>miles recorded</small>
+        </div>
+
+        <div class="summaryCard">
+            <span>Active Faults</span>
+            <strong>{{ faults|length }}</strong>
+            <small>used in prediction</small>
+        </div>
+
+        <div class="summaryCard">
+            <span>AI Confidence</span>
+            <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+            <small>{{ ml_model_used }}</small>
+        </div>
+
+    </section>
+
+    <div class="predictiveGrid">
+
+        <!-- LEFT -->
+        <section class="panel">
+
+            <div class="panelHeader">
+                <h2>🧠 Component Risk Forecast</h2>
+                <span>Live prediction</span>
+            </div>
+
+            <div class="predictionList">
+
+                {% for item in predictive_items %}
+
+                <div class="predictionCard {% if item.risk >= 75 %}danger{% elif item.risk >= 50 %}warning{% else %}good{% endif %}">
+
+                    <div class="predictionTop">
+
+                        <div>
+                            <h3>{{ item.component }}</h3>
+
+                            <p>
+                                {{ item.recommendation }}
+                            </p>
+                        </div>
+
+                        <div class="riskCircle">
+                            <strong>{{ item.risk }}%</strong>
+                            <span>Risk</span>
+                        </div>
+
+                    </div>
+
+                    <div class="riskBar">
+                        <div style="width: {{ item.risk }}%"></div>
+                    </div>
+
+                    <div class="predictionBottom">
+                        <span>Status: <b>{{ item.status }}</b></span>
+                        <span>Est. Remaining: <b>{{ item.remaining_miles }} mi</b></span>
+                    </div>
+
+                    <!-- NEW EXPLAINABILITY -->
+                    <div class="evidenceBox">
+
+                        <div class="evidenceTitle">
+                            Prediction Evidence
+                        </div>
+
+                        <div class="evidenceGrid">
+
+                            <div class="evidenceItem">
+                                <span>Mileage Impact</span>
+                                <strong>
+                                    {% if current_mileage > 60000 %}
+                                        High
+                                    {% elif current_mileage > 30000 %}
+                                        Medium
+                                    {% else %}
+                                        Low
+                                    {% endif %}
+                                </strong>
+                            </div>
+
+                            <div class="evidenceItem">
+                                <span>Fault Influence</span>
+                                <strong>
+                                    {{ faults|length }} Active Faults
+                                </strong>
+                            </div>
+
+                            <div class="evidenceItem">
+                                <span>Vehicle Health</span>
+                                <strong>{{ health_score }}%</strong>
+                            </div>
+
+                            <div class="evidenceItem">
+                                <span>ML Confidence</span>
+                                <strong>
+                                    {{ (ml_confidence * 100)|round(0) }}%
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        <!-- RIGHT -->
+        <div class="rightCol">
+
+            <section class="panel insightPanel">
+
+                <h2>⚡ AI Maintenance Insight</h2>
+
+                <div class="bigInsight">
+                    {{ highest.risk }}%
+                    <span>Top Risk</span>
+                </div>
+
+                <p>
+                    {{ highest.component }} is currently the highest predicted
+                    maintenance risk. DriveSense recommends checking this
+                    component first and reviewing recent service history.
+                </p>
+
+                <a href="/service" class="primaryBtn">
+                    Open Service Records
+                </a>
+
+            </section>
+
+            <!-- NEW INTERPRETABLE AI -->
+            <section class="panel">
+
+                <h2>🧬 Explainable AI Analysis</h2>
+
+                <div class="xaiBox">
+
+                    <div class="xaiRow">
+                        <span>Mileage Weight</span>
+
+                        <div class="xaiBar">
+                            <div style="width:78%"></div>
+                        </div>
+
+                        <strong>78%</strong>
+                    </div>
+
+                    <div class="xaiRow">
+                        <span>Fault Severity Weight</span>
+
+                        <div class="xaiBar">
+                            <div style="width:66%"></div>
+                        </div>
+
+                        <strong>66%</strong>
+                    </div>
+
+                    <div class="xaiRow">
+                        <span>Telemetry Weight</span>
+
+                        <div class="xaiBar">
+                            <div style="width:59%"></div>
+                        </div>
+
+                        <strong>59%</strong>
+                    </div>
+
+                    <div class="xaiRow">
+                        <span>Service History Weight</span>
+
+                        <div class="xaiBar">
+                            <div style="width:82%"></div>
+                        </div>
+
+                        <strong>82%</strong>
+                    </div>
+
+                </div>
+
+                <div class="xaiNote">
+                    DriveSense uses interpretable machine learning principles
+                    to explain how predictions are generated rather than
+                    producing black-box outputs.
+                </div>
+
+            </section>
+
+            <section class="panel">
+
+                <h2>📊 Prediction Inputs</h2>
+
+                <div class="inputRows">
+
+                    <div>
+                        <span>Mileage</span>
+                        <strong>{{ current_mileage }} mi</strong>
+                    </div>
+
+                    <div>
+                        <span>Health Score</span>
+                        <strong>{{ health_score }}%</strong>
+                    </div>
+
+                    <div>
+                        <span>ML Health Score</span>
+                        <strong>{{ ml_health_score }}%</strong>
+                    </div>
+
+                    <div>
+                        <span>Repair Urgency</span>
+                        <strong>{{ repair_urgency }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Safe To Drive</span>
+                        <strong>
+                            {{ "Yes" if safe_to_drive else "No" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="panel">
+
+                <h2>🛠 Recommended Actions</h2>
+
+                <div class="actionList">
+
+                    <div>
+                        <strong>
+                            1. Inspect {{ highest.component }}
+                        </strong>
+
+                        <span>
+                            This is currently the highest risk component.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            2. Review service records
+                        </strong>
+
+                        <span>
+                            Compare latest service date and mileage.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            3. Run diagnostic scan
+                        </strong>
+
+                        <span>
+                            Use live data to improve prediction accuracy.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            4. Export report
+                        </strong>
+
+                        <span>
+                            Create a PDF report for technician review.
+                        </span>
+                    </div>
+
+                </div>
+
+                <a href="/report/pdf" class="secondaryBtn">
+                    Download PDF Report
+                </a>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+.predictivePage{
+    max-width:1600px;
+    margin:auto;
+    padding:28px;
+    color:white;
+}
+
+.predictiveHero,
+.panel,
+.summaryCard{
+    background:linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.predictiveHero{
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:center;
+    padding:32px;
+    margin-bottom:24px;
+}
+
+.heroBadge{
+    display:inline-block;
+    color:#00c8ff;
+    background:rgba(0,200,255,.1);
+    border:1px solid rgba(0,200,255,.25);
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:14px;
+}
+
+.predictiveHero h1{
+    margin:0;
+    font-size:48px;
+}
+
+.predictiveHero p{
+    max-width:760px;
+    opacity:.75;
+    line-height:1.7;
+}
+
+.heroMeta{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:18px;
+}
+
+.heroMeta span{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    padding:11px 15px;
+    border-radius:14px;
+    font-weight:800;
+}
+
+.aiStatusCard{
+    min-width:310px;
+    display:flex;
+    gap:15px;
+    align-items:center;
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    padding:20px;
+    border-radius:20px;
+}
+
+.aiPulse{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#00ff9d;
+    box-shadow:0 0 20px #00ff9d;
+}
+
+.summaryGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.summaryCard{
+    padding:22px;
+}
+
+.summaryCard span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.summaryCard strong{
+    display:block;
+    font-size:28px;
+}
+
+.summaryCard small{
+    display:block;
+    margin-top:8px;
+    color:#00c8ff;
+    font-weight:800;
+}
+
+.predictiveGrid{
+    display:grid;
+    grid-template-columns:1.25fr .75fr;
+    gap:24px;
+}
+
+.panel{
+    padding:24px;
+}
+
+.panelHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.predictionList{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.predictionCard{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    padding:20px;
+}
+
+.predictionCard.good{
+    border-left:5px solid #00ff9d;
+}
+
+.predictionCard.warning{
+    border-left:5px solid #ffb142;
+}
+
+.predictionCard.danger{
+    border-left:5px solid #ff4d4d;
+}
+
+.predictionTop{
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    align-items:center;
+}
+
+.riskCircle{
+    width:92px;
+    height:92px;
+    border-radius:50%;
+    border:7px solid #00c8ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    flex-shrink:0;
+}
+
+.riskBar{
+    height:10px;
+    background:#111827;
+    border-radius:999px;
+    overflow:hidden;
+    margin:18px 0;
+}
+
+.riskBar div{
+    height:100%;
+    background:linear-gradient(90deg,#00ff9d,#00c8ff,#ffb142,#ff4d4d);
+}
+
+.predictionBottom{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.rightCol{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.evidenceBox{
+    margin-top:18px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:18px;
+    padding:18px;
+}
+
+.evidenceTitle{
+    font-size:14px;
+    font-weight:900;
+    color:#00c8ff;
+    margin-bottom:14px;
+}
+
+.evidenceGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.evidenceItem{
+    background:#0b1116;
+    border-radius:14px;
+    padding:12px;
+}
+
+.evidenceItem span{
+    display:block;
+    opacity:.6;
+    margin-bottom:5px;
+    font-size:12px;
+}
+
+.xaiBox{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    margin-top:20px;
+}
+
+.xaiRow{
+    display:grid;
+    grid-template-columns:140px 1fr 60px;
+    align-items:center;
+    gap:14px;
+}
+
+.xaiBar{
+    height:10px;
+    background:#111827;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.xaiBar div{
+    height:100%;
+    background:#00c8ff;
+}
+
+.xaiNote{
+    margin-top:20px;
+    opacity:.72;
+    line-height:1.7;
+}
+
+.primaryBtn,
+.secondaryBtn{
+    display:inline-block;
+    margin-top:16px;
+    border-radius:16px;
+    padding:15px 20px;
+    text-decoration:none;
+    font-weight:900;
+}
+
+.primaryBtn{
+    background:#00c8ff;
+    color:#001014;
+}
+
+.secondaryBtn{
+    background:rgba(0,200,255,.1);
+    border:1px solid #00c8ff;
+    color:white;
+}
+
+.inputRows,
+.actionList{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:18px;
+}
+
+.inputRows div,
+.actionList div{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+    padding:15px;
+}
+
+@media(max-width:1200px){
+    .predictiveGrid,
+    .summaryGrid{
+        grid-template-columns:1fr;
+    }
+
+    .predictiveHero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:700px){
+
+    .predictionTop{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .predictiveHero h1{
+        font-size:36px;
+    }
+
+    .xaiRow{
+        grid-template-columns:1fr;
+    }
+
+    .evidenceGrid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+{% endblock %}

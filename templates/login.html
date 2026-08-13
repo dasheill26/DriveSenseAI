@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="authPage">
+
+    <div class="authCard">
+
+        <div class="authTop">
+
+            <div class="logoCircle">D</div>
+
+            <div class="authBadge">
+                DRIVESENSE AI
+            </div>
+
+            <h1>Welcome Back</h1>
+
+            <p>
+                Sign in to access diagnostics, service history,
+                AI reports and vehicle data.
+            </p>
+
+        </div>
+
+        <form method="POST" action="/login" class="authForm">
+
+            <div>
+                <label>Email</label>
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+
+            <div>
+                <label>Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="loginBtn">
+                Login
+            </button>
+
+        </form>
+
+        <div class="authBottom">
+            Don't have an account?
+            <a href="/register">Create account</a>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+.authPage{
+    min-height:90vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px;
+}
+
+.authCard{
+    width:100%;
+    max-width:520px;
+    background:linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:32px;
+    padding:38px;
+    box-shadow:0 25px 50px rgba(0,0,0,.35);
+}
+
+.authTop{
+    text-align:center;
+    margin-bottom:28px;
+}
+
+.logoCircle{
+    width:92px;
+    height:92px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#00c8ff,#00ff9d);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:auto;
+    font-size:40px;
+    font-weight:900;
+    color:#001014;
+    box-shadow:0 0 30px rgba(0,200,255,.35);
+}
+
+.authBadge{
+    display:inline-block;
+    margin-top:18px;
+    background:rgba(0,200,255,.1);
+    border:1px solid rgba(0,200,255,.25);
+    color:#00c8ff;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.authTop h1{
+    margin:18px 0 10px;
+    font-size:40px;
+    color:white;
+}
+
+.authTop p{
+    color:rgba(255,255,255,.7);
+    line-height:1.7;
+}
+
+.authForm{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:rgba(255,255,255,.72);
+    font-size:13px;
+    font-weight:800;
+}
+
+input{
+    width:100%;
+    background:#111827;
+    border:1px solid #1f2937;
+    color:white;
+    padding:15px;
+    border-radius:15px;
+    font-size:15px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#00c8ff;
+}
+
+.loginBtn{
+    margin-top:10px;
+    background:#00c8ff;
+    color:#001014;
+    border:none;
+    border-radius:16px;
+    padding:16px;
+    font-size:16px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.authBottom{
+    margin-top:26px;
+    text-align:center;
+    color:rgba(255,255,255,.65);
+}
+
+.authBottom a{
+    color:#00c8ff;
+    text-decoration:none;
+    font-weight:800;
+}
+</style>
+
+{% endblock %}

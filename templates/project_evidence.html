@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="evidencePage">
+
+    <section class="evidenceHero">
+        <div>
+            <div class="evidenceBadge">PROJECT EVIDENCE</div>
+            <h1>DriveSense AI Completion Evidence</h1>
+            <p>
+                A structured overview of implemented features, AI/ML evidence,
+                testing coverage, project limitations and future development.
+            </p>
+        </div>
+
+        <div class="evidenceStatus">
+            <strong>Demo Ready</strong>
+            <span>{{ vehicle_name }} • {{ vehicle_year }}</span>
+        </div>
+    </section>
+
+    <section class="evidenceGrid">
+
+        <div class="evidenceCard">
+            <span>Core App</span>
+            <strong>Complete</strong>
+            <small>Dashboard, scan, diagnostics, AI and reports</small>
+        </div>
+
+        <div class="evidenceCard">
+            <span>AI Features</span>
+            <strong>Active</strong>
+            <small>Chat, voice and image diagnostics</small>
+        </div>
+
+        <div class="evidenceCard">
+            <span>ML System</span>
+            <strong>{{ ml_health_score }}%</strong>
+            <small>Predictive health model output</small>
+        </div>
+
+        <div class="evidenceCard">
+            <span>Fault Evidence</span>
+            <strong>{{ faults|length }}</strong>
+            <small>Active diagnostic codes available</small>
+        </div>
+
+    </section>
+
+    <div class="mainEvidenceGrid">
+
+        <section class="panel">
+            <div class="panelHeader">
+                <h2>✅ Implemented Features</h2>
+                <span>System scope</span>
+            </div>
+
+            <div class="featureEvidenceList">
+                <div>Dashboard with vehicle health, faults, live data and service summary</div>
+                <div>Diagnostic fault list with severity scoring and detailed DTC pages</div>
+                <div>Animated vehicle scan workflow with scan history saving</div>
+                <div>Live telemetry cluster with RPM, speed, coolant, load and tyre pressure display</div>
+                <div>AI mechanic assistant with text, voice and vehicle image support</div>
+                <div>Predictive maintenance page with explainable AI reasoning</div>
+                <div>Vehicle report page with MOT-style history and ownership data</div>
+                <div>PDF diagnostic report export for technician review</div>
+                <div>Profile system storing vehicle, VIN, MOT, registration and account details</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panelHeader">
+                <h2>🧠 AI / ML Evidence</h2>
+                <span>Academic value</span>
+            </div>
+
+            <div class="mlEvidenceBox">
+                <div>
+                    <span>ML Health Score</span>
+                    <strong>{{ ml_health_score }}%</strong>
+                </div>
+
+                <div>
+                    <span>Repair Urgency</span>
+                    <strong>{{ repair_urgency }}</strong>
+                </div>
+
+                <div>
+                    <span>Safe To Drive</span>
+                    <strong>{{ "Yes" if safe_to_drive else "No" }}</strong>
+                </div>
+
+                <div>
+                    <span>Confidence</span>
+                    <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+                </div>
+            </div>
+
+            <div class="explainBox">
+                <strong>Explainability Evidence</strong>
+                <p>
+                    DriveSense does not only provide a prediction. It also explains the
+                    reasoning using fault count, severity scoring, live telemetry, mileage
+                    and service history. This supports interpretability and makes the AI
+                    output easier to justify in the final report.
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <section class="panel">
+        <div class="panelHeader">
+            <h2>🧪 Testing Evidence</h2>
+            <span>Validation checklist</span>
+        </div>
+
+        <div class="testingGrid">
+            <div class="testCard pass">
+                <strong>Dashboard Navigation</strong>
+                <span>Pass</span>
+                <p>All major pages are accessible through sidebar navigation.</p>
+            </div>
+
+            <div class="testCard pass">
+                <strong>Scan Workflow</strong>
+                <span>Pass</span>
+                <p>Scan animation completes and stores diagnostic history.</p>
+            </div>
+
+            <div class="testCard pass">
+                <strong>DTC Explanation</strong>
+                <span>Pass</span>
+                <p>Fault pages show definitions, causes, actions and AI links.</p>
+            </div>
+
+            <div class="testCard pass">
+                <strong>AI Assistant</strong>
+                <span>Pass</span>
+                <p>Text chat, voice input and image upload are integrated.</p>
+            </div>
+
+            <div class="testCard pass">
+                <strong>PDF Export</strong>
+                <span>Pass</span>
+                <p>Vehicle diagnostic reports can be generated for review.</p>
+            </div>
+
+            <div class="testCard partial">
+                <strong>Real OBD</strong>
+                <span>Future Test</span>
+                <p>Physical OBD testing planned after software features are stable.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="mainEvidenceGrid">
+
+        <section class="panel">
+            <div class="panelHeader">
+                <h2>⚠ Limitations</h2>
+                <span>Honest evaluation</span>
+            </div>
+
+            <div class="textRows">
+                <div>Real vehicle OBD integration is planned but kept until the final stage to avoid breaking stable features.</div>
+                <div>Machine learning predictions are prototype-level and should support, not replace, professional inspection.</div>
+                <div>Image diagnostics depend on image quality and should not be treated as guaranteed fault confirmation.</div>
+                <div>Demo data is used when live OBD connection is unavailable.</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panelHeader">
+                <h2>🚀 Future Work</h2>
+                <span>Next development</span>
+            </div>
+
+            <div class="textRows">
+                <div>Connect physical Bluetooth or Ethernet OBD adapter for real vehicle testing.</div>
+                <div>Expand DTC database with more manufacturer-specific BMW codes.</div>
+                <div>Add real user testing feedback and usability evaluation.</div>
+                <div>Improve ML model using a larger diagnostic dataset.</div>
+                <div>Add garage export mode for technicians.</div>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+<style>
+.evidencePage{
+    max-width:1600px;
+    margin:auto;
+    padding:28px;
+    color:white;
+}
+
+.evidenceHero,
+.panel,
+.evidenceCard{
+    background:linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.evidenceHero{
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:center;
+    padding:32px;
+    margin-bottom:24px;
+}
+
+.evidenceBadge{
+    display:inline-block;
+    color:#00c8ff;
+    background:rgba(0,200,255,.1);
+    border:1px solid rgba(0,200,255,.25);
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:14px;
+}
+
+.evidenceHero h1{
+    margin:0;
+    font-size:48px;
+}
+
+.evidenceHero p{
+    max-width:780px;
+    opacity:.75;
+    line-height:1.7;
+}
+
+.evidenceStatus{
+    min-width:260px;
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    border-radius:20px;
+    padding:20px;
+}
+
+.evidenceStatus strong{
+    display:block;
+    color:#00ff9d;
+    font-size:24px;
+}
+
+.evidenceStatus span{
+    display:block;
+    opacity:.65;
+    margin-top:8px;
+}
+
+.evidenceGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:24px;
+}
+
+.evidenceCard{
+    padding:22px;
+}
+
+.evidenceCard span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.evidenceCard strong{
+    display:block;
+    font-size:30px;
+}
+
+.evidenceCard small{
+    display:block;
+    margin-top:8px;
+    color:#00c8ff;
+    font-weight:800;
+}
+
+.mainEvidenceGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    margin-bottom:24px;
+}
+
+.panel{
+    padding:24px;
+}
+
+.panelHeader{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.panelHeader h2{
+    margin:0;
+    font-size:24px;
+}
+
+.panelHeader span{
+    color:#00c8ff;
+    font-weight:900;
+}
+
+.featureEvidenceList,
+.textRows{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.featureEvidenceList div,
+.textRows div{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+    padding:15px;
+    line-height:1.6;
+}
+
+.mlEvidenceBox{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.mlEvidenceBox div{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:16px;
+}
+
+.mlEvidenceBox span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.mlEvidenceBox strong{
+    font-size:24px;
+}
+
+.explainBox{
+    margin-top:18px;
+    background:rgba(0,200,255,.08);
+    border:1px solid rgba(0,200,255,.22);
+    border-radius:18px;
+    padding:18px;
+}
+
+.explainBox p{
+    opacity:.75;
+    line-height:1.7;
+    margin-bottom:0;
+}
+
+.testingGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.testCard{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+}
+
+.testCard strong{
+    display:block;
+    font-size:18px;
+}
+
+.testCard span{
+    display:inline-block;
+    margin-top:10px;
+    padding:7px 11px;
+    border-radius:999px;
+    font-weight:900;
+    font-size:12px;
+}
+
+.testCard.pass span{
+    background:rgba(0,255,157,.15);
+    color:#00ff9d;
+}
+
+.testCard.partial span{
+    background:rgba(255,177,66,.15);
+    color:#ffb142;
+}
+
+.testCard p{
+    opacity:.7;
+    line-height:1.6;
+}
+
+@media(max-width:1100px){
+    .evidenceGrid,
+    .mainEvidenceGrid,
+    .testingGrid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .evidenceHero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:700px){
+    .evidenceGrid,
+    .mainEvidenceGrid,
+    .testingGrid,
+    .mlEvidenceBox{
+        grid-template-columns:1fr;
+    }
+
+    .evidenceHero h1{
+        font-size:36px;
+    }
+
+    .panelHeader{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+</style>
+
+{% endblock %}

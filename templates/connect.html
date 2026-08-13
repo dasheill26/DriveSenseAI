@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="pageWrap">
+
+  <div class="pageHeader">
+    <h1 class="pageTitle">Connect</h1>
+  </div>
+
+  <section class="card">
+    <div class="sectionLabel">BEFORE YOU CONNECT</div>
+
+    <div class="steps">
+      <div class="step">1. Plug the scanner into the OBD-II port</div>
+      <div class="step">2. Turn ignition on (or start engine)</div>
+      <div class="step">3. Ensure Bluetooth is enabled</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="sectionLabel">CONNECT WITH</div>
+    <div class="connectTitle">Universal OBD Scanner</div>
+    <div class="hint">Demo mode: marks vehicle as connected and returns to dashboard.</div>
+
+    <!-- ✅ This is the important part -->
+    <form method="POST" action="/connect">
+      <button type="submit" class="btnPrimary">CONNECT</button>
+    </form>
+  </section>
+
+</div>
+
+<style>
+.pageWrap{ max-width: 1100px; margin: 0 auto; padding: 18px; padding-bottom: 96px; }
+.pageHeader{ margin-bottom: 12px; }
+.pageTitle{ margin:0; font-size: 28px; font-weight: 900; }
+
+.card{
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  margin-bottom: 14px;
+}
+
+.sectionLabel{
+  opacity:.7;
+  font-size: 12px;
+  letter-spacing: .9px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.steps{ display:flex; flex-direction:column; gap:10px; }
+.step{
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+}
+
+.connectTitle{ font-size: 22px; font-weight: 900; margin-top: 4px; }
+.hint{ opacity:.75; font-size: 12px; margin-top: 6px; margin-bottom: 14px; }
+
+.btnPrimary{
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(31,196,74,.30);
+  background: rgba(31,196,74,.22);
+  color:#fff;
+  font-weight: 1000;
+  cursor:pointer;
+}
+.btnPrimary:hover{ filter: brightness(1.05); }
+</style>
+
+{% endblock %}

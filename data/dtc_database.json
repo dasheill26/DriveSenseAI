@@ -1,0 +1,45 @@
+{
+    "P0300": {
+      "title": "Random/Multiple Cylinder Misfire Detected",
+      "category": "Engine",
+      "base_score": 8.5,
+      "definition": "The engine is misfiring, meaning one or more cylinders are not firing correctly.",
+      "why_it_matters": "Persistent misfires can damage the catalytic converter and cause unsafe driving conditions due to power loss.",
+      "possible_causes": [
+        "Worn spark plugs",
+        "Faulty ignition coil",
+        "Vacuum leak",
+        "Fuel delivery issue",
+        "MAF sensor issue"
+      ],
+      "recommended_action": "Avoid hard acceleration. If the engine shakes heavily or the check-engine light flashes, stop driving and arrange repair."
+    },
+    "P0420": {
+      "title": "Catalyst System Efficiency Below Threshold (Bank 1)",
+      "category": "Emissions",
+      "base_score": 5.2,
+      "definition": "The catalytic converter is not operating efficiently based on oxygen sensor readings.",
+      "why_it_matters": "Emissions increase and performance may degrade over time. Ignoring it can lead to higher repair costs.",
+      "possible_causes": [
+        "Failing catalytic converter",
+        "Faulty oxygen sensor (O2)",
+        "Exhaust leak",
+        "Engine running rich/lean"
+      ],
+      "recommended_action": "Book a service soon. Check for exhaust leaks and verify oxygen sensor readings before replacing the catalytic converter."
+    },
+    "P0171": {
+      "title": "System Too Lean (Bank 1)",
+      "category": "Fuel/Air",
+      "base_score": 6.4,
+      "definition": "The ECU detects the air-fuel mixture is too lean (too much air, not enough fuel).",
+      "why_it_matters": "Can cause hesitation, misfires, and long-term engine damage if ignored.",
+      "possible_causes": [
+        "Vacuum leak",
+        "Dirty/failed MAF sensor",
+        "Low fuel pressure",
+        "Intake leak"
+      ],
+      "recommended_action": "Inspect for vacuum leaks, clean/inspect MAF sensor, and check fuel pressure."
+    }
+  }

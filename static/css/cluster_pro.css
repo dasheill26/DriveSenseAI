@@ -1,0 +1,54 @@
+body{
+    margin:0;
+    background:#000;
+    color:white;
+    font-family:"Segoe UI",sans-serif;
+}
+
+.cluster-wrapper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+}
+
+#clusterCanvas{
+    width:100%;
+    max-width:1400px;
+    height:auto;
+    background:
+        radial-gradient(circle at center,#0f1720 0%,#02040a 70%,#000 100%);
+    border-radius:26px;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:
+        0 0 40px rgba(0,0,0,.9),
+        0 0 60px rgba(0,200,255,.08),
+        inset 0 0 120px rgba(0,0,0,.95);
+}
+
+.cluster-controls{
+    margin-top:20px;
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.cluster-controls button{
+    background:#111827;
+    border:1px solid #1f2937;
+    color:white;
+    padding:12px 18px;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:700;
+    transition:.2s ease;
+}
+
+.cluster-controls button:hover{
+    background:#00c8ff;
+    color:#000;
+    transform:translateY(-2px);
+}

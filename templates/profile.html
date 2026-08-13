@@ -1,0 +1,617 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="profilePage">
+
+    <section class="profileHero">
+
+        <div class="profileMain">
+            <div class="avatarCircle">
+                <span>{{ user_name[0] if user_name else "D" }}</span>
+            </div>
+
+            <div>
+                <div class="profileBadge">DRIVESENSE ACCOUNT</div>
+                <h1>{{ user_name if user_name else "Dasheill Vas" }}</h1>
+                <p>{{ user_email if user_email else "Premium DriveSense AI user" }}</p>
+
+                <div class="heroTags">
+                    <span>{{ vehicle_name }}</span>
+                    <span>{{ vehicle_year }}</span>
+                    <span>{{ vehicle_mileage if vehicle_mileage else 65081 }} mi</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="securityCard">
+            <div class="lockIcon">🔐</div>
+            <strong>Account Protected</strong>
+            <span>Login system active</span>
+            <a href="/logout">Logout</a>
+        </div>
+
+    </section>
+
+    <div class="profileGrid">
+
+        <div class="leftCol">
+
+            <section class="panel vehiclePanel">
+
+                <div class="panelHeader">
+                    <h2>🚗 Vehicle Profile</h2>
+                    <span>BMW F-Series</span>
+                </div>
+
+                <div class="carPreview">
+                    <img src="{{ url_for('static', filename='img/my_car.png') }}" alt="Vehicle">
+                </div>
+
+                <form method="POST" action="/api/update_profile">
+
+                    <div class="formGrid">
+
+                        <div>
+                            <label>Vehicle Name</label>
+                            <input name="vehicle_name" type="text" value="{{ vehicle_name }}">
+                        </div>
+
+                        <div>
+                            <label>Year</label>
+                            <input name="vehicle_year" type="text" value="{{ vehicle_year }}">
+                        </div>
+
+                        <div>
+                            <label>Model</label>
+                            <input name="vehicle_model" type="text" value="{{ vehicle_model if vehicle_model else '118i M Sport' }}">
+                        </div>
+
+                        <div>
+                            <label>Engine</label>
+                            <input name="vehicle_engine" type="text" value="{{ vehicle_engine if vehicle_engine else '1.5L Petrol' }}">
+                        </div>
+
+                        <div>
+                            <label>Fuel Type</label>
+                            <input name="fuel_type" type="text" value="{{ fuel_type if fuel_type else 'Petrol' }}">
+                        </div>
+
+                        <div>
+                            <label>Current Mileage</label>
+                            <input name="vehicle_mileage" type="number" value="{{ vehicle_mileage if vehicle_mileage else 65081 }}">
+                        </div>
+
+                    </div>
+
+                    <button class="primaryBtn" type="submit">Save Vehicle Details</button>
+
+                </form>
+
+            </section>
+
+            <section class="panel">
+
+                <div class="panelHeader">
+                    <h2>🧾 VIN, MOT & Registration</h2>
+                    <span>Important records</span>
+                </div>
+
+                <form method="POST" action="/api/update_profile">
+
+                    <div class="formGrid">
+
+                        <div>
+                            <label>VIN Number</label>
+                            <input name="vin_number" type="text" value="{{ vin_number if vin_number else '' }}" placeholder="Enter VIN number">
+                        </div>
+
+                        <div>
+                            <label>Registration Plate</label>
+                            <input name="registration_plate" type="text" value="{{ registration_plate if registration_plate else '' }}" placeholder="Enter registration">
+                        </div>
+
+                        <div>
+                            <label>MOT Expiry</label>
+                            <input name="mot_expiry" type="date" value="{{ mot_expiry if mot_expiry else '' }}">
+                        </div>
+
+                        <div>
+                            <label>Insurance Expiry</label>
+                            <input name="insurance_expiry" type="date" value="{{ insurance_expiry if insurance_expiry else '' }}">
+                        </div>
+
+                    </div>
+
+                    <div class="motNotice">
+                        <strong>Maintenance Intelligence</strong>
+                        <p>
+                            DriveSense can use MOT, service records, mileage and vehicle identity data
+                            to calculate upcoming checks, overdue items and maintenance risk.
+                        </p>
+                    </div>
+
+                    <button class="primaryBtn" type="submit">Save Records</button>
+
+                </form>
+
+            </section>
+
+        </div>
+
+        <div class="rightCol">
+
+            <section class="panel">
+
+                <h2>📊 Vehicle Status</h2>
+
+                <div class="statusGrid">
+
+                    <div class="statusBox">
+                        <span>Health Score</span>
+                        <strong>{{ health_score }}%</strong>
+                    </div>
+
+                    <div class="statusBox">
+                        <span>Active Faults</span>
+                        <strong>{{ faults|length }}</strong>
+                    </div>
+
+                    <div class="statusBox">
+                        <span>Connection</span>
+                        <strong>{{ "Connected" if connected else "Offline" }}</strong>
+                    </div>
+
+                    <div class="statusBox">
+                        <span>Last Scan</span>
+                        <strong class="smallText">{{ last_scan or "No scan" }}</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="panel recordSummaryPanel">
+
+                <h2>🧾 Stored Vehicle Records</h2>
+
+                <div class="recordRows">
+
+                    <div>
+                        <span>VIN</span>
+                        <strong>{{ vin_number if vin_number else "Not added" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Registration</span>
+                        <strong>{{ registration_plate if registration_plate else "Not added" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>MOT Expiry</span>
+                        <strong>{{ mot_expiry if mot_expiry else "Not added" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Insurance Expiry</span>
+                        <strong>{{ insurance_expiry if insurance_expiry else "Not added" }}</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="panel premiumPanel">
+
+                <h2>⭐ DriveSense Premium</h2>
+
+                <p>
+                    Your account protects diagnostic reports, service records,
+                    MOT details, VIN information and AI vehicle history.
+                </p>
+
+                <div class="premiumList">
+                    <span>✓ Login protected account</span>
+                    <span>✓ Service timeline</span>
+                    <span>✓ MOT and VIN storage</span>
+                    <span>✓ PDF diagnostic export</span>
+                    <span>✓ AI diagnostic support</span>
+                </div>
+
+            </section>
+
+            <section class="panel">
+
+                <h2>⚙ Account Settings</h2>
+
+                <form method="POST" action="/api/update_profile">
+
+                    <div class="formStack">
+
+                        <div>
+                            <label>Owner Name</label>
+                            <input name="user_name" type="text" value="{{ user_name if user_name else 'Dasheill Vas' }}">
+                        </div>
+
+                        <div>
+                            <label>Email</label>
+                            <input name="user_email" type="email" value="{{ user_email if user_email else '' }}">
+                        </div>
+
+                        <div>
+                            <label>Notification Preference</label>
+                            <select name="notifications">
+                                <option value="Enabled" {% if notifications != "Disabled" %}selected{% endif %}>Enabled</option>
+                                <option value="Disabled" {% if notifications == "Disabled" %}selected{% endif %}>Disabled</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Default OBD Port</label>
+                            <input name="obd_port" type="text" value="{{ obd_port if obd_port else 'COM5' }}">
+                        </div>
+
+                    </div>
+
+                    <button class="secondaryBtn" type="submit">Update Account</button>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+.profilePage{
+    max-width:1600px;
+    margin:auto;
+    padding:28px;
+    color:white;
+}
+
+.profileHero,
+.panel{
+    background:linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.profileHero{
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:center;
+    padding:30px;
+    margin-bottom:24px;
+}
+
+.profileMain{
+    display:flex;
+    align-items:center;
+    gap:22px;
+}
+
+.avatarCircle{
+    width:96px;
+    height:96px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#00c8ff,#00ff9d);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#001014;
+    font-size:42px;
+    font-weight:900;
+    box-shadow:0 0 30px rgba(0,200,255,.35);
+}
+
+.profileBadge{
+    display:inline-block;
+    color:#00c8ff;
+    background:rgba(0,200,255,.1);
+    border:1px solid rgba(0,200,255,.25);
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:10px;
+}
+
+.profileHero h1{
+    margin:0;
+    font-size:42px;
+}
+
+.profileHero p{
+    opacity:.72;
+    margin:8px 0 0;
+}
+
+.heroTags{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:15px;
+}
+
+.heroTags span{
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.08);
+    padding:10px 13px;
+    border-radius:13px;
+    font-weight:800;
+}
+
+.securityCard{
+    min-width:250px;
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    padding:20px;
+    border-radius:20px;
+}
+
+.securityCard span{
+    display:block;
+    opacity:.65;
+    margin-top:5px;
+}
+
+.securityCard a{
+    display:inline-block;
+    margin-top:14px;
+    color:#ff4d4d;
+    text-decoration:none;
+    font-weight:900;
+}
+
+.lockIcon{
+    font-size:28px;
+    margin-bottom:8px;
+}
+
+.profileGrid{
+    display:grid;
+    grid-template-columns:1.25fr .75fr;
+    gap:24px;
+}
+
+.leftCol,
+.rightCol{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.panel{
+    padding:24px;
+}
+
+.panelHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.panel h2,
+.panelHeader h2{
+    margin:0;
+    font-size:24px;
+}
+
+.panelHeader span{
+    color:#00c8ff;
+    font-weight:900;
+}
+
+.carPreview{
+    background:
+    radial-gradient(circle,rgba(0,255,157,.16),transparent 65%),
+    rgba(0,0,0,.2);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    margin-bottom:20px;
+    min-height:220px;
+}
+
+.carPreview img{
+    max-width:85%;
+    max-height:260px;
+    object-fit:contain;
+    filter:drop-shadow(0 28px 32px rgba(0,0,0,.55));
+}
+
+.formGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+}
+
+.formStack{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    margin-top:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    opacity:.7;
+    font-size:13px;
+    font-weight:800;
+}
+
+input,
+select{
+    width:100%;
+    background:#111827;
+    border:1px solid #1f2937;
+    color:white;
+    padding:14px;
+    border-radius:14px;
+    font-size:15px;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#00c8ff;
+}
+
+.primaryBtn,
+.secondaryBtn{
+    margin-top:20px;
+    border:none;
+    border-radius:16px;
+    padding:15px 22px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.primaryBtn{
+    background:#00c8ff;
+    color:#001014;
+}
+
+.secondaryBtn{
+    background:rgba(0,200,255,.1);
+    border:1px solid #00c8ff;
+    color:white;
+}
+
+.motNotice{
+    margin-top:18px;
+    background:rgba(0,200,255,.08);
+    border:1px solid rgba(0,200,255,.22);
+    padding:18px;
+    border-radius:18px;
+}
+
+.motNotice p{
+    opacity:.72;
+    line-height:1.6;
+}
+
+.statusGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:18px;
+}
+
+.statusBox{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:17px;
+    padding:18px;
+}
+
+.statusBox span{
+    display:block;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.statusBox strong{
+    font-size:26px;
+}
+
+.smallText{
+    font-size:15px !important;
+}
+
+.recordSummaryPanel{
+    background:
+    radial-gradient(circle at top right,rgba(0,255,157,.12),transparent 42%),
+    linear-gradient(145deg,#0b1418,#071014);
+}
+
+.recordRows{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:18px;
+}
+
+.recordRows div{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+    padding:14px;
+}
+
+.recordRows span{
+    display:block;
+    opacity:.6;
+    margin-bottom:6px;
+}
+
+.recordRows strong{
+    font-size:15px;
+    word-break:break-word;
+}
+
+.premiumPanel{
+    background:
+    radial-gradient(circle at top right,rgba(0,200,255,.15),transparent 42%),
+    linear-gradient(145deg,#0b1418,#071014);
+}
+
+.premiumPanel p{
+    opacity:.75;
+    line-height:1.7;
+}
+
+.premiumList{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:18px;
+}
+
+.premiumList span{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    padding:13px;
+    border-radius:13px;
+}
+
+@media(max-width:1100px){
+    .profileGrid{
+        grid-template-columns:1fr;
+    }
+
+    .profileHero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:700px){
+    .profileMain{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .formGrid,
+    .statusGrid{
+        grid-template-columns:1fr;
+    }
+
+    .profileHero h1{
+        font-size:34px;
+    }
+}
+</style>
+
+{% endblock %}

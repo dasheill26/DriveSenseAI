@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>DriveSense AI</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    :root{
+      --bg:#050b0f;
+      --bg2:#071014;
+      --sidebar:#071116;
+      --topbar:rgba(6,13,18,.86);
+      --card:#0b141a;
+      --card2:#111827;
+      --line:rgba(255,255,255,.08);
+      --muted:rgba(255,255,255,.62);
+      --text:#ffffff;
+      --blue:#00c8ff;
+      --green:#00ff9d;
+      --red:#ff4d4d;
+      --amber:#ffb142;
+      --cyan:#66fcff;
+      --shadow:0 24px 70px rgba(0,0,0,.34);
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      opacity:0;
+      transform:translateY(8px);
+      transition:opacity .35s ease, transform .35s ease;
+      background:
+        radial-gradient(circle at 78% 0%,rgba(0,200,255,.10),transparent 32%),
+        radial-gradient(circle at 12% 100%,rgba(0,255,157,.08),transparent 34%),
+        linear-gradient(135deg,var(--bg),var(--bg2));
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      overflow-x:hidden;
+    }
+
+    body.loaded{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    a{
+      color:inherit;
+    }
+
+    .app-wrapper{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:286px;
+      background:
+        radial-gradient(circle at top left,rgba(0,200,255,.12),transparent 35%),
+        linear-gradient(180deg,#071116,#050b0f);
+      border-right:1px solid rgba(255,255,255,.07);
+      padding:24px 20px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      position:fixed;
+      left:0;
+      top:0;
+      bottom:0;
+      z-index:100;
+      overflow-y:auto;
+      box-shadow:18px 0 45px rgba(0,0,0,.24);
+    }
+
+    .sidebar::-webkit-scrollbar{
+      width:6px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb{
+      background:#1f2937;
+      border-radius:999px;
+    }
+
+    .main-area{
+      margin-left:286px;
+      width:calc(100% - 286px);
+      min-height:100vh;
+    }
+
+    .topbar{
+      min-height:86px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      padding:22px 34px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:
+        linear-gradient(90deg,rgba(5,11,15,.94),rgba(7,16,20,.82)),
+        var(--topbar);
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      box-shadow:0 18px 45px rgba(0,0,0,.20);
+    }
+
+    .content{
+      padding:24px;
+    }
+
+    .logo{
+      padding:6px 4px 12px;
+    }
+
+    .logo h2{
+      margin:0;
+      font-size:30px;
+      color:var(--blue);
+      font-weight:900;
+      letter-spacing:-.7px;
+      line-height:1;
+    }
+
+    .logo h2 span{
+      color:var(--green);
+    }
+
+    .vehicle-label{
+      display:block;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .nav-links{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:24px;
+    }
+
+    .nav-links a{
+      text-decoration:none;
+      color:white;
+      padding:13px 15px;
+      border-radius:16px;
+      font-weight:900;
+      transition:.22s ease;
+      border:1px solid transparent;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      position:relative;
+      overflow:hidden;
+      opacity:.86;
+    }
+
+    .nav-links a::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,rgba(0,200,255,.12),rgba(0,255,157,.08));
+      opacity:0;
+      transition:.22s ease;
+    }
+
+    .nav-links a span{
+      position:relative;
+      z-index:2;
+    }
+
+    .nav-links a:hover{
+      opacity:1;
+      background:rgba(255,255,255,.045);
+      border-color:rgba(255,255,255,.08);
+      transform:translateX(4px);
+    }
+
+    .nav-links a:hover::before{
+      opacity:1;
+    }
+
+    .nav-links a.active{
+      opacity:1;
+      background:linear-gradient(135deg,var(--blue),var(--green));
+      color:#001014;
+      border-color:transparent;
+      box-shadow:0 14px 34px rgba(0,200,255,.22);
+    }
+
+    .nav-links a.active::before{
+      display:none;
+    }
+
+    .sidebar-bottom{
+      margin-top:20px;
+    }
+
+    .user-box{
+      margin-top:18px;
+      padding:15px;
+      border-radius:18px;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:inset 0 0 24px rgba(255,255,255,.015);
+    }
+
+    .user-box strong{
+      display:block;
+      color:white;
+      font-size:14px;
+      margin-bottom:5px;
+    }
+
+    .user-box span{
+      display:block;
+      color:rgba(255,255,255,.55);
+      font-size:12px;
+      word-break:break-word;
+      line-height:1.4;
+    }
+
+    .logout-btn,
+    .login-link{
+      margin-top:12px;
+      display:block;
+      text-align:center;
+      padding:11px 12px;
+      border-radius:13px;
+      text-decoration:none;
+      font-weight:900;
+      font-size:13px;
+      transition:.22s ease;
+    }
+
+    .logout-btn{
+      background:rgba(255,77,77,.12);
+      border:1px solid rgba(255,77,77,.4);
+      color:#ff8f8f;
+    }
+
+    .logout-btn:hover{
+      background:rgba(255,77,77,.2);
+    }
+
+    .login-link{
+      background:rgba(0,200,255,.12);
+      border:1px solid rgba(0,200,255,.4);
+      color:var(--blue);
+    }
+
+    .status{
+      margin-top:14px;
+      padding:13px;
+      border-radius:15px;
+      text-align:center;
+      font-weight:900;
+      font-size:13px;
+    }
+
+    .connected{
+      background:rgba(0,255,157,.12);
+      color:var(--green);
+      border:1px solid rgba(0,255,157,.3);
+      box-shadow:0 0 22px rgba(0,255,157,.06);
+    }
+
+    .disconnected{
+      background:rgba(255,77,77,.12);
+      color:#ff8f8f;
+      border:1px solid rgba(255,77,77,.3);
+    }
+
+    .theme-toggle{
+      margin-top:14px;
+      width:100%;
+      border:none;
+      border-radius:15px;
+      padding:13px;
+      background:linear-gradient(145deg,#111827,#0d141d);
+      border:1px solid rgba(255,255,255,.08);
+      color:white;
+      cursor:pointer;
+      font-weight:900;
+      transition:.22s ease;
+    }
+
+    .theme-toggle:hover{
+      border-color:var(--blue);
+      transform:translateY(-2px);
+    }
+
+    .hamburger{
+      display:none;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      color:white;
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      font-size:25px;
+      cursor:pointer;
+    }
+
+    .mobile-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      z-index:90;
+      opacity:0;
+      visibility:hidden;
+      transition:.3s;
+      backdrop-filter:blur(3px);
+    }
+
+    .mobile-overlay.show{
+      opacity:1;
+      visibility:visible;
+    }
+
+    .page-title{
+      margin:0;
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-.6px;
+    }
+
+    .last-scan{
+      color:rgba(255,255,255,.58);
+      font-size:13px;
+      white-space:nowrap;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    html[data-theme="light"] body{
+      background:#f3f7fb;
+      color:#111827;
+    }
+
+    html[data-theme="light"] .sidebar{
+      background:white;
+      border-right:1px solid rgba(0,0,0,.06);
+    }
+
+    html[data-theme="light"] .topbar{
+      background:rgba(255,255,255,.9);
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+
+    html[data-theme="light"] .nav-links a{
+      color:#111827;
+    }
+
+    html[data-theme="light"] .vehicle-label,
+    html[data-theme="light"] .last-scan{
+      color:#6b7280;
+    }
+
+    html[data-theme="light"] .theme-toggle{
+      background:#e5e7eb;
+      color:#111827;
+    }
+
+    html[data-theme="light"] .user-box{
+      background:#f3f4f6;
+      border:1px solid #e5e7eb;
+    }
+
+    html[data-theme="light"] .user-box strong{
+      color:#111827;
+    }
+
+    html[data-theme="light"] .user-box span{
+      color:#6b7280;
+    }
+
+    @media(max-width:1100px){
+      .sidebar{
+        transform:translateX(-100%);
+        transition:.3s ease;
+      }
+
+      .sidebar.mobile-open{
+        transform:translateX(0);
+      }
+
+      .main-area{
+        margin-left:0;
+        width:100%;
+      }
+
+      .hamburger{
+        display:block;
+      }
+
+      .content{
+        padding:18px;
+      }
+
+      .topbar{
+        padding:16px 18px;
+        min-height:74px;
+      }
+
+      .page-title{
+        font-size:24px;
+      }
+    }
+
+    @media(max-width:650px){
+      .last-scan{
+        display:none;
+      }
+
+      .sidebar{
+        width:286px;
+      }
+
+      .content{
+        padding:14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app-wrapper">
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+
+        <div>
+
+            <div class="logo">
+                <h2>Drive<span>Sense</span></h2>
+
+                <span class="vehicle-label">
+                    {{ vehicle_name }} • {{ vehicle_year }}
+                </span>
+            </div>
+
+            <nav class="nav-links">
+
+                <a href="/" class="{% if active_page == 'dashboard' %}active{% endif %}">
+                    <span>🏠 Dashboard</span>
+                </a>
+
+                <a href="/diagnostics" class="{% if active_page == 'diagnostics' %}active{% endif %}">
+                    <span>🧰 Diagnostics</span>
+                </a>
+
+                <a href="/scan" class="{% if active_page == 'scan' %}active{% endif %}">
+                    <span>🔍 Scan</span>
+                </a>
+
+                <a href="/live" class="{% if active_page == 'live' %}active{% endif %}">
+                    <span>📡 Live Data</span>
+                </a>
+
+                <a href="/predictive" class="{% if active_page == 'predictive' %}active{% endif %}">
+                    <span>🧠 Predictive AI</span>
+                </a>
+
+                <a href="/vehicle-report" class="{% if active_page == 'vehicle_report' %}active{% endif %}">
+                    <span>📋 Vehicle Report</span>
+                </a>
+
+                <a href="/project-evidence" class="{% if active_page == 'project_evidence' %}active{% endif %}">
+                    <span>🎓 Project Evidence</span>
+                </a>
+
+                <a href="/service" class="{% if active_page == 'service' %}active{% endif %}">
+                    <span>🛠 Service Records</span>
+                </a>
+
+                <a href="/ai" class="{% if active_page == 'ai' %}active{% endif %}">
+                    <span>🤖 AI Assistant</span>
+                </a>
+
+                <a href="/profile" class="{% if active_page == 'profile' %}active{% endif %}">
+                    <span>👤 Profile</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            {% if user_name %}
+                <div class="user-box">
+                    <strong>{{ user_name }}</strong>
+                    <span>{{ user_email }}</span>
+
+                    <a href="/logout" class="logout-btn">
+                        Logout
+                    </a>
+                </div>
+            {% else %}
+                <a href="/login" class="login-link">
+                    Login
+                </a>
+            {% endif %}
+
+            <div class="status {{ 'connected' if connected else 'disconnected' }}">
+                ● {{ "Connected" if connected else "Offline" }}
+            </div>
+
+            <button class="theme-toggle" id="themeToggle">
+                Toggle Theme
+            </button>
+
+        </div>
+
+    </aside>
+
+    <div class="main-area">
+
+        <header class="topbar">
+
+            <button class="hamburger" id="menuBtn">☰</button>
+
+            <h1 class="page-title">
+
+                {% if active_page == "dashboard" %}
+                    Dashboard
+                {% elif active_page == "diagnostics" %}
+                    Diagnostics
+                {% elif active_page == "scan" %}
+                    Scan Vehicle
+                {% elif active_page == "live" %}
+                    Live Data
+                {% elif active_page == "predictive" %}
+                    Predictive AI
+                {% elif active_page == "vehicle_report" %}
+                    Vehicle Report
+                {% elif active_page == "project_evidence" %}
+                    Project Evidence
+                {% elif active_page == "service" %}
+                    Service Records
+                {% elif active_page == "ai" %}
+                    AI Assistant
+                {% elif active_page == "profile" %}
+                    Profile
+                {% elif active_page == "auth" %}
+                    DriveSense Account
+                {% else %}
+                    DriveSense AI
+                {% endif %}
+
+            </h1>
+
+            {% if last_scan %}
+                <span class="last-scan">
+                    Last Scan: {{ last_scan }}
+                </span>
+            {% endif %}
+
+        </header>
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+
+    </div>
+
+</div>
+
+<script>
+window.addEventListener("load", () => {
+  document.body.classList.add("loaded");
+});
+
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("mobileOverlay");
+const menuBtn = document.getElementById("menuBtn");
+
+menuBtn?.addEventListener("click", () => {
+  sidebar.classList.toggle("mobile-open");
+  overlay.classList.toggle("show");
+});
+
+overlay?.addEventListener("click", () => {
+  sidebar.classList.remove("mobile-open");
+  overlay.classList.remove("show");
+});
+
+document.querySelectorAll(".nav-links a").forEach((link) => {
+  link.addEventListener("click", () => {
+    sidebar.classList.remove("mobile-open");
+    overlay.classList.remove("show");
+  });
+});
+
+const themeBtn = document.getElementById("themeToggle");
+const savedTheme = localStorage.getItem("drivesense_theme");
+
+if(savedTheme){
+  document.documentElement.setAttribute("data-theme", savedTheme);
+}
+
+themeBtn?.addEventListener("click", () => {
+  const html = document.documentElement;
+  const current = html.getAttribute("data-theme");
+  const nextTheme = current === "dark" ? "light" : "dark";
+
+  html.style.transition = "all .3s ease";
+  html.setAttribute("data-theme", nextTheme);
+
+  localStorage.setItem("drivesense_theme", nextTheme);
+});
+</script>
+
+<script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

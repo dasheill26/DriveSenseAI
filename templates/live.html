@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cluster_pro.css') }}">
+
+<div class="livePage fade-in">
+
+    <!-- HERO -->
+    <section class="liveHero glass">
+
+        <div>
+            <div class="label">Real-Time Vehicle Telemetry</div>
+            <h1>Live Data Monitor</h1>
+            <p>
+                View simulated or OBD live data, monitor sensor behaviour, and connect telemetry with DriveSense ML risk predictions.
+            </p>
+        </div>
+
+        <div class="liveHeroStatus">
+            {% if connected %}
+                <span class="pulse"></span>
+                <strong>Connected</strong>
+            {% else %}
+                <span class="pulse offline"></span>
+                <strong>Demo Mode</strong>
+            {% endif %}
+        </div>
+
+    </section>
+
+    <!-- ML SUMMARY -->
+    <section class="card card-wide glass liveMlPanel">
+
+        <div class="liveMlItem">
+            <span>ML Health</span>
+            <strong class="green">{{ ml_health_score }}%</strong>
+        </div>
+
+        <div class="liveMlItem">
+            <span>Repair Urgency</span>
+
+            {% if repair_urgency == "Critical" %}
+                <strong class="red">{{ repair_urgency }}</strong>
+            {% elif repair_urgency == "High" %}
+                <strong class="orange">{{ repair_urgency }}</strong>
+            {% elif repair_urgency == "Medium" %}
+                <strong class="yellow">{{ repair_urgency }}</strong>
+            {% else %}
+                <strong class="green">{{ repair_urgency }}</strong>
+            {% endif %}
+        </div>
+
+        <div class="liveMlItem">
+            <span>Safe To Drive</span>
+            {% if safe_to_drive %}
+                <strong class="green">Yes</strong>
+            {% else %}
+                <strong class="red">No</strong>
+            {% endif %}
+        </div>
+
+        <div class="liveMlItem">
+            <span>Model Confidence</span>
+            <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+        </div>
+
+    </section>
+
+    <!-- LIVE DATA CARDS -->
+    <section class="liveGrid">
+
+        <div class="liveCard">
+            <div class="liveCardTop">
+                <span>Engine RPM</span>
+                <small>Revolutions per minute</small>
+            </div>
+
+            <div class="gaugeWrap">
+                <div class="gauge">
+                    <div class="gaugeFill" id="rpmGauge"></div>
+                    <div class="gaugeText">
+                        <strong id="rpmValue">--</strong>
+                        <span>RPM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="liveCard">
+            <div class="liveCardTop">
+                <span>Coolant Temp</span>
+                <small>Engine temperature</small>
+            </div>
+
+            <div class="gaugeWrap">
+                <div class="gauge">
+                    <div class="gaugeFill" id="coolantGauge"></div>
+                    <div class="gaugeText">
+                        <strong id="coolantValue">--</strong>
+                        <span>°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="liveCard">
+            <div class="liveCardTop">
+                <span>Engine Load</span>
+                <small>Current load demand</small>
+            </div>
+
+            <div class="gaugeWrap">
+                <div class="gauge">
+                    <div class="gaugeFill" id="loadGauge"></div>
+                    <div class="gaugeText">
+                        <strong id="loadValue">--</strong>
+                        <span>%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="liveCard">
+            <div class="liveCardTop">
+                <span>Vehicle Speed</span>
+                <small>Current speed</small>
+            </div>
+
+            <div class="speedBox">
+                <strong id="speedValue">--</strong>
+                <span>mph</span>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- CLUSTER -->
+    <section class="card card-wide glass clusterSection">
+
+        <div class="clusterHeader">
+            <div>
+                <div class="label">Digital Instrument Cluster</div>
+                <h2>DriveSense Cluster View</h2>
+                <p class="muted">
+                    A visual cockpit-style display for presenting real-time telemetry.
+                </p>
+            </div>
+
+            <div class="cluster-controls">
+                <button id="driveModeBtn">Drive Mode: COMFORT</button>
+                <button id="brightnessBtn">Brightness: NIGHT</button>
+            </div>
+        </div>
+
+        <div class="cluster-wrapper">
+            <canvas id="clusterCanvas" width="1400" height="600"></canvas>
+        </div>
+
+    </section>
+
+    <!-- AI INSIGHT -->
+    <section class="card card-wide glass aiInsightLive">
+
+        <div class="aiIcon">🧠</div>
+
+        <div>
+            <h3>DriveSense Live Insight</h3>
+            <p id="liveInsightText">
+                Waiting for live telemetry...
+            </p>
+        </div>
+
+        <button class="btn primary" id="refreshLiveBtn">
+            Refresh Live Data
+        </button>
+
+    </section>
+
+</div>
+
+<style>
+.livePage{
+    padding:28px;
+    max-width:1500px;
+    margin:auto;
+    color:white;
+}
+
+.liveHero{
+    background:linear-gradient(135deg,#0f1720,#071018);
+    border:1px solid #182331;
+    border-radius:30px;
+    padding:30px;
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:center;
+    margin-bottom:22px;
+}
+
+.liveHero h1{
+    margin:8px 0;
+    font-size:42px;
+}
+
+.liveHero p{
+    opacity:.75;
+    max-width:800px;
+    line-height:1.6;
+}
+
+.liveHeroStatus{
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    padding:16px 20px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.pulse{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#00ff9d;
+    box-shadow:0 0 18px #00ff9d;
+}
+
+.pulse.offline{
+    background:#ff9f1c;
+    box-shadow:0 0 18px #ff9f1c;
+}
+
+.liveMlPanel{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:22px;
+    padding:20px;
+}
+
+.liveMlItem{
+    background:#0a0f14;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    padding:18px;
+}
+
+.liveMlItem span{
+    display:block;
+    font-size:12px;
+    opacity:.65;
+    margin-bottom:8px;
+}
+
+.liveMlItem strong{
+    font-size:26px;
+}
+
+.liveGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:22px;
+}
+
+.liveCard{
+    background:#0a0f14;
+    border:1px solid #18212c;
+    border-radius:28px;
+    padding:22px;
+}
+
+.liveCardTop span{
+    display:block;
+    font-size:18px;
+    font-weight:800;
+}
+
+.liveCardTop small{
+    display:block;
+    margin-top:6px;
+    opacity:.65;
+}
+
+.gaugeWrap{
+    display:flex;
+    justify-content:center;
+    margin-top:24px;
+}
+
+.gauge{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    background:conic-gradient(#00c8ff 0deg,#111827 0deg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+.gauge::after{
+    content:"";
+    position:absolute;
+    width:125px;
+    height:125px;
+    border-radius:50%;
+    background:#0a0f14;
+}
+
+.gaugeText{
+    position:relative;
+    z-index:2;
+    text-align:center;
+}
+
+.gaugeText strong{
+    display:block;
+    font-size:34px;
+}
+
+.gaugeText span{
+    opacity:.65;
+}
+
+.speedBox{
+    margin-top:34px;
+    min-height:170px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.speedBox strong{
+    font-size:64px;
+    line-height:1;
+}
+
+.speedBox span{
+    opacity:.65;
+    margin-top:6px;
+}
+
+.clusterSection{
+    padding:26px;
+    margin-bottom:22px;
+}
+
+.clusterHeader{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    align-items:flex-start;
+    margin-bottom:20px;
+}
+
+.clusterHeader h2{
+    margin:6px 0;
+    font-size:30px;
+}
+
+.cluster-wrapper{
+    width:100%;
+    overflow:hidden;
+    border-radius:24px;
+    background:#03070c;
+    border:1px solid #1f2937;
+}
+
+.cluster-wrapper canvas{
+    width:100%;
+    height:auto;
+    display:block;
+}
+
+.cluster-controls{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.cluster-controls button{
+    background:#111827;
+    color:white;
+    border:1px solid #1f2937;
+    padding:12px 16px;
+    border-radius:14px;
+    cursor:pointer;
+}
+
+.aiInsightLive{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:22px;
+}
+
+.aiInsightLive h3{
+    margin:0 0 8px;
+}
+
+.aiInsightLive p{
+    margin:0;
+    opacity:.75;
+    line-height:1.6;
+}
+
+.aiIcon{
+    font-size:34px;
+}
+
+.green{color:#00ff9d;}
+.yellow{color:#ffd166;}
+.orange{color:#ff9f1c;}
+.red{color:#ff4d4d;}
+
+@media(max-width:1200px){
+    .liveGrid,
+    .liveMlPanel{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .liveHero,
+    .clusterHeader,
+    .aiInsightLive{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:700px){
+    .liveGrid,
+    .liveMlPanel{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+<script src="{{ url_for('static', filename='js/cluster_pro.js') }}"></script>
+
+<script>
+(function(){
+
+    const rpmValue = document.getElementById("rpmValue");
+    const coolantValue = document.getElementById("coolantValue");
+    const loadValue = document.getElementById("loadValue");
+    const speedValue = document.getElementById("speedValue");
+
+    const liveInsightText = document.getElementById("liveInsightText");
+    const refreshLiveBtn = document.getElementById("refreshLiveBtn");
+
+    function setGauge(id, percent){
+        const el = document.getElementById(id);
+
+        if(!el) return;
+
+        const angle = Math.max(0, Math.min(100, percent)) * 3.6;
+
+        el.parentElement.style.background =
+            `conic-gradient(#00c8ff ${angle}deg,#111827 ${angle}deg)`;
+    }
+
+    async function fetchLiveData(){
+
+        try{
+
+            const res = await fetch("/api/live_data");
+
+            const data = await res.json();
+
+            let rpm = data.rpm || 820;
+            let coolant = data.coolant_temp || 91;
+            let load = data.engine_load || 18;
+            let speed = data.speed || 0;
+
+            rpmValue.textContent = rpm;
+            coolantValue.textContent = coolant;
+            loadValue.textContent = load;
+            speedValue.textContent = speed;
+
+            setGauge("rpmGauge", rpm / 70);
+            setGauge("coolantGauge", coolant);
+            setGauge("loadGauge", load);
+
+            if(coolant > 105){
+                liveInsightText.textContent =
+                    "Coolant temperature is high. Monitor the engine temperature and inspect the cooling system.";
+            }else if(load > 65){
+                liveInsightText.textContent =
+                    "Engine load is elevated. This may be normal under acceleration, but persistent high load should be checked.";
+            }else{
+                liveInsightText.textContent =
+                    "Live telemetry appears stable. No immediate abnormal sensor pattern detected.";
+            }
+
+        }catch(err){
+
+            rpmValue.textContent = "820";
+            coolantValue.textContent = "91";
+            loadValue.textContent = "18";
+            speedValue.textContent = "0";
+
+            setGauge("rpmGauge", 12);
+            setGauge("coolantGauge", 91);
+            setGauge("loadGauge", 18);
+
+            liveInsightText.textContent =
+                "Using demo telemetry because live OBD data is unavailable.";
+        }
+    }
+
+    refreshLiveBtn.addEventListener("click", fetchLiveData);
+
+    fetchLiveData();
+
+    setInterval(fetchLiveData, 4000);
+
+})();
+</script>
+
+{% endblock %}

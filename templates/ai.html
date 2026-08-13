@@ -1,0 +1,986 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="aiPage">
+
+    <div class="heroCard">
+
+        <div class="heroLeft">
+
+            <div class="topBadge">DRIVE SENSE AI</div>
+
+            <h1 class="mainTitle">Your Personal AI Mechanic</h1>
+
+            <p class="heroText">
+                Talk naturally with DriveSense using voice, text or vehicle images.
+                Diagnose faults, understand warning lights, view ML risk predictions
+                and get professional repair guidance instantly.
+            </p>
+
+            <div class="vehicleLine">
+                <span>{{ vehicle_name }}</span>
+                <div class="miniDot"></div>
+                <span>{{ vehicle_year }}</span>
+                <div class="miniDot"></div>
+                <span>Rule Health {{ health_score }}%</span>
+                <div class="miniDot"></div>
+                <span>ML Health {{ ml_health_score }}%</span>
+            </div>
+
+        </div>
+
+        <div class="heroRight">
+
+            <div class="heroStatus">
+                <div class="pulse"></div>
+                AI ONLINE
+            </div>
+
+            <div class="heyBox">
+                <div class="heyTitle">Try asking:</div>
+                <div class="heyCommand">“Explain my ML risk prediction”</div>
+                <div class="heyCommand">“Is my car safe to drive?”</div>
+                <div class="heyCommand">“What should I repair first?”</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mainGrid">
+
+        <div class="chatSection">
+
+            <div class="statusRow">
+
+                <div class="statusCard">
+                    <div class="statusLabel">AI ENGINE</div>
+                    <div class="statusValue green">● ONLINE</div>
+                </div>
+
+                <div class="statusCard">
+                    <div class="statusLabel">VOICE SYSTEM</div>
+                    <div class="statusValue">Whisper Active</div>
+                </div>
+
+                <div class="statusCard">
+                    <div class="statusLabel">ML URGENCY</div>
+
+                    {% if repair_urgency == "Critical" %}
+                        <div class="statusValue red">{{ repair_urgency }}</div>
+                    {% elif repair_urgency == "High" %}
+                        <div class="statusValue orange">{{ repair_urgency }}</div>
+                    {% elif repair_urgency == "Medium" %}
+                        <div class="statusValue yellow">{{ repair_urgency }}</div>
+                    {% else %}
+                        <div class="statusValue green">{{ repair_urgency }}</div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="aiMlStrip">
+
+                <div class="aiMlItem">
+                    <span>ML Health</span>
+                    <strong class="green">{{ ml_health_score }}%</strong>
+                </div>
+
+                <div class="aiMlItem">
+                    <span>Safe To Drive</span>
+
+                    {% if safe_to_drive %}
+                        <strong class="green">Yes</strong>
+                    {% else %}
+                        <strong class="red">No</strong>
+                    {% endif %}
+                </div>
+
+                <div class="aiMlItem">
+                    <span>Confidence</span>
+                    <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+                </div>
+
+                <div class="aiMlItem">
+                    <span>Model</span>
+                    <strong>{{ ml_model_used }}</strong>
+                </div>
+
+            </div>
+
+            <div class="aiMlMessage">
+                <strong>ML Insight:</strong> {{ ml_message }}
+            </div>
+
+            <div class="quickWrap">
+
+                <button data-quick="Explain my ML vehicle health prediction in simple terms">
+                    ML Prediction
+                </button>
+
+                <button data-quick="Is my car safe to drive based on the current prediction?">
+                    Safe To Drive
+                </button>
+
+                <button data-quick="What should I repair first based on my faults?">
+                    Repair Priority
+                </button>
+
+                <button data-quick="Explain my engine problem simply">
+                    Engine Help
+                </button>
+
+                <button data-quick="Estimate repair cost">
+                    Repair Cost
+                </button>
+
+                <button data-quick="What maintenance should I do next?">
+                    Maintenance
+                </button>
+
+            </div>
+
+            <div id="chatBox" class="chatBox"></div>
+
+            <div class="voiceBar">
+
+                <div class="voiceLeft">
+
+                    <div class="voiceOrb">
+                        <div class="voiceDot" id="voiceDot"></div>
+                    </div>
+
+                    <div>
+                        <div class="voiceTitle">DriveSense Voice Assistant</div>
+                        <div class="voiceSub" id="voiceStatus">Ready for voice commands</div>
+                    </div>
+
+                </div>
+
+                <div class="voiceActions">
+                    <div class="voiceTimer" id="recordTimer">0s</div>
+                    <button id="stopVoiceBtn" class="miniBtn">Stop Voice</button>
+                </div>
+
+            </div>
+
+            <div class="inputArea">
+
+                <button id="micBtn" class="micBtn">🎤</button>
+
+                <input
+                    id="chatInput"
+                    autocomplete="off"
+                    placeholder="Ask DriveSense about faults, ML risk, repairs or symptoms..."
+                >
+
+                <button id="sendBtn" class="sendBtn">➤</button>
+
+            </div>
+
+        </div>
+
+        <div class="sidePanel">
+
+            <div class="panelCard mlPanel">
+
+                <div class="panelTitle">🧠 ML Risk Prediction</div>
+
+                <div class="panelDesc">
+                    DriveSense combines active faults, severity scoring and live sensor values
+                    to estimate vehicle risk.
+                </div>
+
+                <div class="mlCircle">
+                    <div>
+                        <span>{{ ml_health_score }}%</span>
+                        <small>Predicted Health</small>
+                    </div>
+                </div>
+
+                <div class="sysRow">
+                    <span>Repair Urgency</span>
+
+                    {% if repair_urgency == "Critical" %}
+                        <span class="red">{{ repair_urgency }}</span>
+                    {% elif repair_urgency == "High" %}
+                        <span class="orange">{{ repair_urgency }}</span>
+                    {% elif repair_urgency == "Medium" %}
+                        <span class="yellow">{{ repair_urgency }}</span>
+                    {% else %}
+                        <span class="green">{{ repair_urgency }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="sysRow">
+                    <span>Safe To Drive</span>
+
+                    {% if safe_to_drive %}
+                        <span class="green">Yes</span>
+                    {% else %}
+                        <span class="red">No</span>
+                    {% endif %}
+                </div>
+
+                <div class="sysRow">
+                    <span>Confidence</span>
+                    <span>{{ (ml_confidence * 100)|round(0) }}%</span>
+                </div>
+
+            </div>
+
+            <div class="panelCard">
+
+                <div class="panelTitle">📸 Vehicle Image Diagnostics</div>
+
+                <div class="panelDesc">
+                    Upload dashboard warnings, engine bays, leaks,
+                    tyres, brakes or damaged components.
+                </div>
+
+                <label for="imageInput" class="uploadButton">
+                    Upload Vehicle Image
+                </label>
+
+                <input type="file" id="imageInput" accept="image/*">
+
+                <div id="uploadStatus" class="uploadStatus">
+                    No image uploaded
+                </div>
+
+                <div id="uploadPreview"></div>
+
+            </div>
+
+            <div class="panelCard">
+
+                <div class="panelTitle">⚡ Intelligence Stack</div>
+
+                <div class="featureList">
+                    <div class="featureItem">✔ Machine Learning Prediction</div>
+                    <div class="featureItem">✔ Whisper Voice Recognition</div>
+                    <div class="featureItem">✔ Ollama AI Mechanic Chat</div>
+                    <div class="featureItem">✔ LLaVA Image Diagnostics</div>
+                    <div class="featureItem">✔ Fault Code Explanation</div>
+                </div>
+
+            </div>
+
+            <div class="panelCard">
+
+                <div class="panelTitle">🔧 Quick Actions</div>
+
+                <div class="actionButtons">
+                    <a href="/scan">Scan Vehicle</a>
+                    <a href="/diagnostics">View Diagnostics</a>
+                    <button id="clearBtn">Reset Chat</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+.aiPage{
+    padding:30px;
+    max-width:1600px;
+    margin:auto;
+    color:white;
+}
+
+.heroCard{
+    background:
+        radial-gradient(circle at top right,rgba(0,200,255,.12),transparent 35%),
+        linear-gradient(135deg,#0f1720,#081018);
+    border:1px solid #182331;
+    border-radius:34px;
+    padding:34px;
+    display:flex;
+    justify-content:space-between;
+    gap:30px;
+    margin-bottom:26px;
+    box-shadow:0 24px 60px rgba(0,0,0,.32);
+}
+
+.heroLeft{
+    max-width:850px;
+}
+
+.topBadge{
+    display:inline-block;
+    padding:8px 14px;
+    border-radius:50px;
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    color:#00c8ff;
+    font-size:12px;
+    letter-spacing:1px;
+    margin-bottom:18px;
+    font-weight:900;
+}
+
+.mainTitle{
+    font-size:52px;
+    margin:0;
+    line-height:1.1;
+}
+
+.heroText{
+    margin-top:18px;
+    font-size:17px;
+    opacity:.75;
+    line-height:1.7;
+    max-width:720px;
+}
+
+.vehicleLine{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:20px;
+    opacity:.75;
+}
+
+.miniDot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#00c8ff;
+}
+
+.heroRight{
+    min-width:320px;
+}
+
+.heroStatus{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    padding:18px;
+    border-radius:20px;
+    margin-bottom:18px;
+    font-weight:900;
+}
+
+.pulse{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#00ff9d;
+    box-shadow:0 0 18px #00ff9d;
+    animation:pulseGreen 1.4s infinite;
+}
+
+.heyBox{
+    background:#09131d;
+    border:1px solid #1d2a3a;
+    border-radius:24px;
+    padding:22px;
+}
+
+.heyTitle{
+    font-size:14px;
+    opacity:.6;
+    margin-bottom:16px;
+}
+
+.heyCommand{
+    background:#111827;
+    border:1px solid #1f2937;
+    padding:14px;
+    border-radius:16px;
+    margin-bottom:12px;
+    line-height:1.5;
+}
+
+.mainGrid{
+    display:grid;
+    grid-template-columns:1.7fr .8fr;
+    gap:24px;
+}
+
+.chatSection{
+    background:#0a0f14;
+    border:1px solid #18212c;
+    border-radius:30px;
+    padding:24px;
+    box-shadow:0 20px 50px rgba(0,0,0,.28);
+}
+
+.statusRow{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:20px;
+}
+
+.statusCard{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    padding:18px;
+}
+
+.statusLabel{
+    font-size:11px;
+    opacity:.6;
+    margin-bottom:8px;
+    font-weight:900;
+}
+
+.statusValue{
+    font-size:18px;
+    font-weight:900;
+}
+
+.green{
+    color:#00ff9d;
+}
+
+.yellow{
+    color:#ffd166;
+}
+
+.orange{
+    color:#ff9f1c;
+}
+
+.red{
+    color:#ff4d4d;
+}
+
+.aiMlStrip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:14px;
+}
+
+.aiMlItem{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:16px;
+    padding:14px;
+}
+
+.aiMlItem span{
+    display:block;
+    font-size:11px;
+    opacity:.6;
+    margin-bottom:6px;
+    font-weight:900;
+}
+
+.aiMlItem strong{
+    font-size:20px;
+}
+
+.aiMlMessage{
+    background:rgba(0,200,255,.08);
+    border:1px solid rgba(0,200,255,.22);
+    padding:14px 16px;
+    border-radius:16px;
+    margin-bottom:18px;
+    line-height:1.6;
+}
+
+.quickWrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.quickWrap button{
+    background:#111827;
+    border:1px solid #1f2937;
+    color:white;
+    padding:12px 18px;
+    border-radius:50px;
+    cursor:pointer;
+    transition:.2s;
+    font-weight:800;
+}
+
+.quickWrap button:hover{
+    background:#00c8ff;
+    color:black;
+    transform:translateY(-2px);
+}
+
+.chatBox{
+    height:560px;
+    overflow-y:auto;
+    background:
+        radial-gradient(circle at top left, rgba(0,200,255,.08), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0,255,157,.05), transparent 25%),
+        #05080c;
+    border:1px solid #182534;
+    border-radius:28px;
+    padding:24px;
+    margin-bottom:20px;
+    backdrop-filter:blur(20px);
+    box-shadow:
+        inset 0 0 40px rgba(255,255,255,.02),
+        0 10px 40px rgba(0,0,0,.35);
+    scroll-behavior:smooth;
+    position:relative;
+}
+
+.chatBox::-webkit-scrollbar{
+    width:8px;
+}
+
+.chatBox::-webkit-scrollbar-thumb{
+    background:#1f2937;
+    border-radius:10px;
+}
+
+.msg{
+    display:flex;
+    margin:16px 0;
+    animation:fadeSlide .35s ease;
+}
+
+.msg.user{
+    justify-content:flex-end;
+}
+
+.bubble{
+    max-width:78%;
+    padding:18px 20px;
+    border-radius:24px;
+    line-height:1.75;
+    white-space:pre-wrap;
+    font-size:15px;
+    position:relative;
+    overflow:hidden;
+}
+
+.msg.bot .bubble{
+    background:linear-gradient(135deg,#111827,#0f1720);
+    border:1px solid #1f2937;
+    box-shadow:
+        0 0 20px rgba(0,0,0,.2),
+        inset 0 0 20px rgba(255,255,255,.015);
+    color:white;
+}
+
+.msg.bot .bubble::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.03),transparent);
+    transform:translateX(-100%);
+    animation:shine 4s infinite;
+}
+
+.msg.user .bubble{
+    background:linear-gradient(135deg,#00c8ff,#00ffcc);
+    color:black;
+    font-weight:800;
+    box-shadow:0 0 25px rgba(0,200,255,.2);
+}
+
+.thinkingWrap{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.thinkingDots{
+    display:flex;
+    gap:6px;
+}
+
+.thinkingDots div{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00c8ff;
+    animation:thinkingBounce 1s infinite;
+}
+
+.thinkingDots div:nth-child(2){
+    animation-delay:.15s;
+}
+
+.thinkingDots div:nth-child(3){
+    animation-delay:.3s;
+}
+
+.voiceBar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:22px;
+    padding:16px;
+    margin-bottom:20px;
+}
+
+.voiceLeft{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.voiceOrb{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,200,255,.08);
+    border:1px solid rgba(0,200,255,.22);
+}
+
+.voiceDot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#444;
+}
+
+.voiceDot.active{
+    background:#ff004c;
+    box-shadow:
+        0 0 14px #ff004c,
+        0 0 30px rgba(255,0,76,.5);
+    animation:pulseGlow 1s infinite;
+}
+
+.voiceTitle{
+    font-weight:900;
+}
+
+.voiceSub{
+    font-size:13px;
+    opacity:.7;
+    margin-top:3px;
+}
+
+.voiceActions{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.voiceTimer{
+    font-size:22px;
+    font-weight:900;
+    color:#00c8ff;
+}
+
+.miniBtn{
+    background:#0f1720;
+    border:1px solid #1f2937;
+    color:white;
+    padding:10px 16px;
+    border-radius:14px;
+    cursor:pointer;
+    font-weight:800;
+}
+
+.inputArea{
+    display:flex;
+    gap:12px;
+}
+
+.inputArea input{
+    flex:1;
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:22px;
+    padding:18px;
+    color:white;
+    font-size:15px;
+}
+
+.inputArea input:focus{
+    outline:none;
+    border-color:#00c8ff;
+}
+
+.micBtn,
+.sendBtn{
+    width:66px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:22px;
+    transition:.2s;
+}
+
+.micBtn{
+    background:linear-gradient(135deg,#151d27,#0f1720);
+    color:white;
+    border:1px solid #223042;
+    box-shadow:inset 0 0 12px rgba(255,255,255,.03);
+    position:relative;
+}
+
+.micBtn.active{
+    background:linear-gradient(135deg,#ff004c,#ff3b3b);
+    animation:pulseGlow 1.2s infinite;
+}
+
+.sendBtn{
+    background:#00c8ff;
+    color:black;
+}
+
+.sendBtn:hover,
+.micBtn:hover{
+    transform:scale(1.04);
+}
+
+.sidePanel{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.panelCard{
+    background:#0a0f14;
+    border:1px solid #18212c;
+    border-radius:28px;
+    padding:22px;
+    box-shadow:0 18px 45px rgba(0,0,0,.24);
+}
+
+.panelTitle{
+    font-size:20px;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.panelDesc{
+    opacity:.7;
+    line-height:1.7;
+    margin-bottom:18px;
+}
+
+.mlPanel{
+    background:
+        radial-gradient(circle at top right,rgba(0,200,255,.13),transparent 42%),
+        linear-gradient(180deg,#0a0f14,#081018);
+}
+
+.mlCircle{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    border:10px solid #00c8ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:18px auto;
+    box-shadow:0 0 30px rgba(0,200,255,.15);
+}
+
+.mlCircle span{
+    display:block;
+    text-align:center;
+    font-size:38px;
+    font-weight:900;
+}
+
+.mlCircle small{
+    display:block;
+    text-align:center;
+    opacity:.65;
+    margin-top:4px;
+}
+
+.uploadButton{
+    display:block;
+    background:#00c8ff;
+    color:black;
+    text-align:center;
+    padding:16px;
+    border-radius:18px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+#imageInput{
+    display:none;
+}
+
+.uploadStatus{
+    margin-top:14px;
+    font-size:14px;
+    opacity:.7;
+}
+
+#uploadPreview{
+    margin-top:18px;
+}
+
+#uploadPreview img{
+    width:100%;
+    border-radius:18px;
+    border:1px solid #1f2937;
+}
+
+.featureList{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.featureItem{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:14px;
+    padding:14px;
+}
+
+.sysRow{
+    display:flex;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px solid #1a2330;
+}
+
+.actionButtons{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.actionButtons a,
+.actionButtons button{
+    background:#111827;
+    border:1px solid #1f2937;
+    color:white;
+    text-decoration:none;
+    padding:16px;
+    border-radius:16px;
+    cursor:pointer;
+    text-align:center;
+    font-weight:800;
+}
+
+@keyframes fadeSlide{
+    from{
+        opacity:0;
+        transform:translateY(12px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes shine{
+    0%{
+        transform:translateX(-100%);
+    }
+
+    100%{
+        transform:translateX(200%);
+    }
+}
+
+@keyframes pulseGlow{
+    0%{
+        box-shadow:0 0 0 rgba(0,200,255,.2);
+    }
+
+    50%{
+        box-shadow:
+            0 0 25px rgba(0,200,255,.45),
+            0 0 50px rgba(0,200,255,.15);
+    }
+
+    100%{
+        box-shadow:0 0 0 rgba(0,200,255,.2);
+    }
+}
+
+@keyframes pulseGreen{
+    0%{
+        transform:scale(1);
+        opacity:.7;
+    }
+
+    50%{
+        transform:scale(1.18);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:.7;
+    }
+}
+
+@keyframes thinkingBounce{
+    0%,100%{
+        transform:translateY(0);
+        opacity:.5;
+    }
+
+    50%{
+        transform:translateY(-5px);
+        opacity:1;
+    }
+}
+
+@media(max-width:1200px){
+    .mainGrid{
+        grid-template-columns:1fr;
+    }
+
+    .heroCard{
+        flex-direction:column;
+    }
+}
+
+@media(max-width:900px){
+    .statusRow,
+    .aiMlStrip{
+        grid-template-columns:1fr;
+    }
+
+    .mainTitle{
+        font-size:38px;
+    }
+
+    .voiceBar{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:14px;
+    }
+
+    .inputArea{
+        flex-direction:column;
+    }
+
+    .micBtn,
+    .sendBtn{
+        width:100%;
+        height:58px;
+    }
+}
+</style>
+
+<script src="{{ url_for('static', filename='js/ai.js') }}"></script>
+
+{% endblock %}

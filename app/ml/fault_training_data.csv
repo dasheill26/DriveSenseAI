@@ -1,0 +1,16 @@
+fault_count,coolant_temp,engine_load,rpm,severity_score,health_score,urgency
+0,90,18,820,1,95,low
+1,92,22,850,3,85,low
+1,96,28,900,4,78,medium
+2,98,35,950,5,68,medium
+2,104,42,1000,6,58,medium
+3,106,50,1100,7,45,high
+3,112,60,1200,8,35,high
+4,115,70,1300,9,25,high
+5,120,80,1500,10,15,critical
+1,88,20,780,2,90,low
+2,91,30,860,5,72,medium
+3,108,55,1050,8,40,high
+4,118,75,1400,9,22,critical
+0,87,16,750,1,97,low
+1,100,40,920,5,70,medium

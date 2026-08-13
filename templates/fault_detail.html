@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="faultPage fade-in">
+
+    <!-- HERO -->
+    <section class="faultHero glass">
+
+        <div class="faultHeroLeft">
+
+            <a href="/diagnostics" class="backBtn">
+                ← Back to Diagnostics
+            </a>
+
+            <div class="faultCode">
+                {{ fault.code }}
+            </div>
+
+            <h1>{{ fault.title }}</h1>
+
+            <p>
+                AI-powered diagnostic interpretation with ML risk analysis,
+                repair guidance, safe-to-drive assessment and predictive fault intelligence.
+            </p>
+
+            <div class="faultMeta">
+
+                <div>
+                    <span>Vehicle</span>
+                    <strong>{{ vehicle_name }}</strong>
+                </div>
+
+                <div>
+                    <span>ML Health</span>
+                    <strong>{{ ml_health_score }}%</strong>
+                </div>
+
+                <div>
+                    <span>Confidence</span>
+                    <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="faultHeroRight">
+
+            <div class="severityBox {{ fault.sev_class if fault.sev_class else fault.severity }}">
+                {{ fault.severity_label if fault.severity_label else fault.severity|capitalize }}
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- AI SUMMARY -->
+    <section class="glass aiSummaryCard">
+
+        <div class="aiSummaryTop">
+
+            <div>
+                <div class="sectionTag">DRIVESENSE AI INTERPRETATION</div>
+
+                <h2>AI Diagnostic Summary</h2>
+            </div>
+
+            <a href="/ai?code={{ fault.code }}" class="aiBtn">
+                Open AI Assistant
+            </a>
+
+        </div>
+
+        <p class="aiSummaryText">
+
+            {% if safe_to_drive %}
+                DriveSense AI believes the vehicle is currently drivable,
+                but this issue should still be investigated to avoid future damage.
+            {% else %}
+                DriveSense AI recommends caution. Continued driving could
+                increase the risk of engine or emissions system damage.
+            {% endif %}
+
+            {{ fault.definition if fault.definition else
+            "The engine control unit detected an abnormal operating condition requiring inspection." }}
+
+        </p>
+
+        <div class="summaryGrid">
+
+            <div class="summaryBox">
+                <span>Repair Urgency</span>
+
+                {% if repair_urgency == "Critical" %}
+                    <strong class="red">{{ repair_urgency }}</strong>
+                {% elif repair_urgency == "High" %}
+                    <strong class="orange">{{ repair_urgency }}</strong>
+                {% elif repair_urgency == "Medium" %}
+                    <strong class="yellow">{{ repair_urgency }}</strong>
+                {% else %}
+                    <strong class="green">{{ repair_urgency }}</strong>
+                {% endif %}
+            </div>
+
+            <div class="summaryBox">
+                <span>Safe To Drive</span>
+
+                {% if safe_to_drive %}
+                    <strong class="green">YES</strong>
+                {% else %}
+                    <strong class="red">NO</strong>
+                {% endif %}
+            </div>
+
+            <div class="summaryBox">
+                <span>Severity Score</span>
+                <strong>{{ fault.severity_score if fault.severity_score else "N/A" }}/10</strong>
+            </div>
+
+            <div class="summaryBox">
+                <span>ML Model</span>
+                <strong>{{ ml_model_used }}</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- MAIN GRID -->
+    <div class="faultGrid">
+
+        <!-- LEFT -->
+        <div class="leftColumn">
+
+            <section class="glass infoCard">
+
+                <div class="sectionTag">FAULT DESCRIPTION</div>
+
+                <h2>What This Code Means</h2>
+
+                <p>
+                    {{ fault.definition if fault.definition else
+                    "This diagnostic trouble code indicates that the ECU detected a condition outside normal operating parameters." }}
+                </p>
+
+            </section>
+
+            <section class="glass infoCard">
+
+                <div class="sectionTag">POSSIBLE CAUSES</div>
+
+                <h2>Likely Causes</h2>
+
+                {% if fault.causes %}
+
+                    <ul class="styledList">
+
+                        {% for cause in fault.causes %}
+                            <li>{{ cause }}</li>
+                        {% endfor %}
+
+                    </ul>
+
+                {% else %}
+
+                    <ul class="styledList">
+                        <li>Sensor malfunction or incorrect reading</li>
+                        <li>Damaged wiring or loose connector</li>
+                        <li>Fuel or air imbalance</li>
+                        <li>Mechanical wear or component failure</li>
+                    </ul>
+
+                {% endif %}
+
+            </section>
+
+            <section class="glass infoCard">
+
+                <div class="sectionTag">RECOMMENDED ACTIONS</div>
+
+                <h2>Repair Suggestions</h2>
+
+                {% if fault.solutions %}
+
+                    <ul class="styledList">
+
+                        {% for action in fault.solutions %}
+                            <li>{{ action }}</li>
+                        {% endfor %}
+
+                    </ul>
+
+                {% else %}
+
+                    <ul class="styledList">
+                        <li>Run a fresh diagnostic scan</li>
+                        <li>Inspect related sensors and wiring</li>
+                        <li>Clear the code and retest</li>
+                        <li>Seek professional inspection if the issue returns</li>
+                    </ul>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="rightColumn">
+
+            <section class="glass sideCard">
+
+                <div class="sectionTag">MACHINE LEARNING</div>
+
+                <h2>Predictive Analysis</h2>
+
+                <p class="sideText">
+                    DriveSense ML combines severity scoring, telemetry,
+                    live data and historical patterns to estimate vehicle health.
+                </p>
+
+                <div class="miniStat">
+                    <span>Predicted Vehicle Health</span>
+                    <strong>{{ ml_health_score }}%</strong>
+                </div>
+
+                <div class="miniStat">
+                    <span>Model Confidence</span>
+                    <strong>{{ (ml_confidence * 100)|round(0) }}%</strong>
+                </div>
+
+                <div class="miniStat">
+                    <span>Risk Classification</span>
+
+                    {% if repair_urgency == "Critical" %}
+                        <strong class="red">High Risk</strong>
+                    {% elif repair_urgency == "High" %}
+                        <strong class="orange">Elevated Risk</strong>
+                    {% elif repair_urgency == "Medium" %}
+                        <strong class="yellow">Moderate Risk</strong>
+                    {% else %}
+                        <strong class="green">Low Risk</strong>
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+            <section class="glass sideCard">
+
+                <div class="sectionTag">DRIVING ADVICE</div>
+
+                <h2>Should You Keep Driving?</h2>
+
+                {% if safe_to_drive %}
+
+                    <div class="driveAdvice greenBorder">
+                        The vehicle is likely safe for short-term driving,
+                        but the fault should still be diagnosed and repaired.
+                    </div>
+
+                {% else %}
+
+                    <div class="driveAdvice redBorder">
+                        Continued driving may worsen the issue or damage
+                        emissions and engine systems.
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+            <section class="glass sideCard">
+
+                <div class="sectionTag">QUICK ACTIONS</div>
+
+                <h2>Next Steps</h2>
+
+                <div class="actionGrid">
+
+                    <a href="/scan" class="actionBtn">
+                        Run Scan
+                    </a>
+
+                    <a href="/diagnostics" class="actionBtn">
+                        View Faults
+                    </a>
+
+                    <a href="/ai?code={{ fault.code }}" class="actionBtn primaryAction">
+                        AI Explain
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.faultPage{
+    max-width:1500px;
+    margin:auto;
+    color:white;
+}
+
+.glass{
+    background:
+    linear-gradient(145deg,#0b1418,#071014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.faultHero{
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:center;
+    padding:34px;
+    margin-bottom:22px;
+}
+
+.backBtn{
+    display:inline-block;
+    margin-bottom:18px;
+    color:#00c8ff;
+    text-decoration:none;
+    font-weight:800;
+}
+
+.faultCode{
+    color:#ff4d4d;
+    font-size:18px;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.faultHero h1{
+    margin:0;
+    font-size:46px;
+}
+
+.faultHero p{
+    margin-top:16px;
+    max-width:850px;
+    opacity:.75;
+    line-height:1.7;
+}
+
+.faultMeta{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:24px;
+}
+
+.faultMeta div{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:16px;
+}
+
+.faultMeta span{
+    display:block;
+    opacity:.6;
+    margin-bottom:8px;
+    font-size:12px;
+}
+
+.severityBox{
+    padding:18px 24px;
+    border-radius:18px;
+    font-weight:900;
+    font-size:20px;
+}
+
+.sev-high{
+    background:rgba(255,77,77,.15);
+    color:#ff4d4d;
+}
+
+.sev-med{
+    background:rgba(255,177,66,.15);
+    color:#ffb142;
+}
+
+.sev-low{
+    background:rgba(0,255,157,.15);
+    color:#00ff9d;
+}
+
+.aiSummaryCard{
+    padding:28px;
+    margin-bottom:22px;
+}
+
+.aiSummaryTop{
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    align-items:center;
+}
+
+.sectionTag{
+    color:#00c8ff;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:10px;
+}
+
+.aiBtn{
+    background:#00c8ff;
+    color:#001014;
+    text-decoration:none;
+    padding:14px 18px;
+    border-radius:16px;
+    font-weight:900;
+}
+
+.aiSummaryText{
+    margin-top:18px;
+    line-height:1.8;
+    opacity:.78;
+}
+
+.summaryGrid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:24px;
+}
+
+.summaryBox{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:16px;
+}
+
+.summaryBox span{
+    display:block;
+    opacity:.6;
+    font-size:12px;
+    margin-bottom:8px;
+}
+
+.summaryBox strong{
+    font-size:26px;
+}
+
+.faultGrid{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:22px;
+}
+
+.infoCard,
+.sideCard{
+    padding:24px;
+    margin-bottom:22px;
+}
+
+.infoCard h2,
+.sideCard h2{
+    margin:0 0 14px;
+}
+
+.infoCard p,
+.sideText{
+    opacity:.75;
+    line-height:1.8;
+}
+
+.styledList{
+    margin:0;
+    padding-left:20px;
+    line-height:1.9;
+    opacity:.82;
+}
+
+.miniStat{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:14px;
+    margin-top:12px;
+}
+
+.miniStat span{
+    display:block;
+    opacity:.6;
+    margin-bottom:8px;
+    font-size:12px;
+}
+
+.miniStat strong{
+    font-size:20px;
+}
+
+.driveAdvice{
+    padding:18px;
+    border-radius:18px;
+    line-height:1.7;
+    font-weight:700;
+}
+
+.greenBorder{
+    background:rgba(0,255,157,.08);
+    border:1px solid rgba(0,255,157,.28);
+}
+
+.redBorder{
+    background:rgba(255,77,77,.08);
+    border:1px solid rgba(255,77,77,.28);
+}
+
+.actionGrid{
+    display:grid;
+    gap:12px;
+}
+
+.actionBtn{
+    text-decoration:none;
+    background:#111827;
+    border:1px solid rgba(255,255,255,.08);
+    color:white;
+    padding:14px;
+    border-radius:14px;
+    text-align:center;
+    font-weight:800;
+}
+
+.primaryAction{
+    background:#00c8ff;
+    color:#001014;
+}
+
+.green{color:#00ff9d;}
+.yellow{color:#ffd166;}
+.orange{color:#ff9f1c;}
+.red{color:#ff4d4d;}
+
+@media(max-width:1100px){
+
+    .faultGrid,
+    .summaryGrid,
+    .faultMeta{
+        grid-template-columns:1fr;
+    }
+
+    .faultHero,
+    .aiSummaryTop{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+
+{% endblock %}
