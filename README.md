@@ -14,6 +14,10 @@ DriveSense AI transforms raw OBD-II telemetry and fault codes into plain-English
 
 Final Year BSc Software Engineering project — Bournemouth University, 2026.
 
+### 🔗 [Live Demo](https://drivesenseai.onrender.com)
+
+> Hosted on Render's free tier — the first load after a period of inactivity can take 30–50 seconds to wake up. AI chat and image analysis are disabled on the live demo (they rely on a local Ollama instance); everything else — dashboard, diagnostics, live telemetry, predictive AI, and PDF reports — runs live using demo/simulated vehicle data.
+
 </div>
 
 ---
